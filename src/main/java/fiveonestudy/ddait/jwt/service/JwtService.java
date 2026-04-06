@@ -1,10 +1,10 @@
 package fiveonestudy.ddait.jwt.service;
 
+import fiveonestudy.ddait.jwt.dto.TokenDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,21 +66,6 @@ public class JwtService {
                 .compact();
     }
 
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setHeader(accessHeader, accessToken);
-        log.info("Access Token 발급: {}", accessToken);
-    }
-
-    public void sendAccessAndRefreshToken(HttpServletResponse response,
-                                          String accessToken,
-                                          String refreshToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-        setAccessTokenHeader(response, accessToken);
-        setRefreshTokenHeader(response, refreshToken);
-        log.info("Access / Refresh Token 발급 완료");
-    }
-
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(refreshHeader))
                 .filter(token -> token.startsWith(BEARER))
@@ -108,14 +93,6 @@ public class JwtService {
         }
     }
 
-    public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-        response.setHeader(accessHeader, accessToken);
-    }
-
-    public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-        response.setHeader(refreshHeader, refreshToken);
-    }
-
     public boolean isTokenValid(String token) {
         try {
             Jwts.parser()
@@ -127,5 +104,13 @@ public class JwtService {
             log.error("유효하지 않은 토큰: {}", e.getMessage());
             return false;
         }
+    }
+
+    public TokenDto issueToken(String email) {
+
+        String accessToken = createAccessToken(email);
+        String refreshToken = createRefreshToken();
+
+        return new TokenDto(accessToken, refreshToken);
     }
 }

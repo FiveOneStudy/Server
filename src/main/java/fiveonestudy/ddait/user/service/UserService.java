@@ -1,5 +1,7 @@
 package fiveonestudy.ddait.user.service;
 
+import fiveonestudy.ddait.jwt.dto.TokenDto;
+import fiveonestudy.ddait.jwt.service.JwtService;
 import fiveonestudy.ddait.user.dto.UserSignUpDto;
 import fiveonestudy.ddait.user.entity.Role;
 import fiveonestudy.ddait.user.entity.User;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -16,15 +19,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public void signUp(UserSignUpDto dto) {
+    public TokenDto signUp(UserSignUpDto dto) {
 
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-        }
-
-        if (userRepository.existsByNickname(dto.getNickname())) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
         }
 
         User user = User.builder()
@@ -35,7 +35,7 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+
+        return jwtService.issueToken(user.getEmail());
     }
-
-
 }

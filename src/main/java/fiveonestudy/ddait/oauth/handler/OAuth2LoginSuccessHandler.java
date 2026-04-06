@@ -1,8 +1,11 @@
 package fiveonestudy.ddait.oauth.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fiveonestudy.ddait.jwt.dto.TokenDto;
 import fiveonestudy.ddait.jwt.service.JwtService;
 import fiveonestudy.ddait.oauth.CustomOAuth2User;
 import fiveonestudy.ddait.user.entity.Role;
+import fiveonestudy.ddait.user.entity.User;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,6 +16,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -32,14 +36,18 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getEmail();
 
-        userRepository.findByEmail(email)
-                .ifPresentOrElse(
-                        user -> loginSuccess(response, email),     // 기존 유저
-                        () -> signUpAndLogin(response, oAuth2User) // 신규 유저
-                );
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            loginSuccess(response, email);
+        } else {
+            signUpAndLogin(response, oAuth2User);
+        }
     }
 
-    private void signUpAndLogin(HttpServletResponse response, CustomOAuth2User oAuth2User) {
+    private void signUpAndLogin(HttpServletResponse response,
+                                CustomOAuth2User oAuth2User) throws IOException {
+
         String email = oAuth2User.getEmail();
 
         fiveonestudy.ddait.user.entity.User newUser =
@@ -55,17 +63,18 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         loginSuccess(response, email);
     }
 
-    private void loginSuccess(HttpServletResponse response, String email) {
+    private void loginSuccess(HttpServletResponse response, String email) throws IOException {
 
-        String accessToken = jwtService.createAccessToken(email);
-        String refreshToken = jwtService.createRefreshToken();
-
-        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        TokenDto token = jwtService.issueToken(email);
 
         userRepository.findByEmail(email)
                 .ifPresent(user -> {
-                    user.updateRefreshToken(refreshToken);
+                    user.updateRefreshToken(token.refreshToken());
                     userRepository.saveAndFlush(user);
                 });
+
+        response.setContentType("application/json;charset=UTF-8");
+
+        new ObjectMapper().writeValue(response.getOutputStream(), token);
     }
 }
