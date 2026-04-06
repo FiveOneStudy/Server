@@ -157,4 +157,22 @@ public class PlanService {
 
         return getPlan(email, requestDto.getDate());
     }
+
+    public PlanResponse completeCheckList(String email, CheckListCompleteRequest requestDto) {
+
+        CheckList check = checkListRepository
+                .findByEmailAndDateAndCheckContent(
+                        email,
+                        requestDto.getDate(),
+                        requestDto.getContent()
+                )
+                .orElseThrow(() -> new RuntimeException("해당 체크리스트가 없습니다."));
+
+        // 🔥 false → true 변경
+        check.updateCompleted(true);
+
+        checkListRepository.save(check);
+
+        return getPlan(email, requestDto.getDate());
+    }
 }
