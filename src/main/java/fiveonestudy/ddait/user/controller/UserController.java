@@ -1,5 +1,6 @@
 package fiveonestudy.ddait.user.controller;
 
+import fiveonestudy.ddait.jwt.dto.TokenDto;
 import fiveonestudy.ddait.user.dto.UserSignUpDto;
 import fiveonestudy.ddait.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,13 +14,9 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/auth/signup")
-    public ResponseEntity<?> signUp(@RequestBody @Validated UserSignUpDto dto) {
-        try {
-            userService.signUp(dto);
-            return ResponseEntity.status(205).build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/signup")
+    public ResponseEntity<TokenDto> signUp(@RequestBody @Validated UserSignUpDto dto) {
+
+        return ResponseEntity.ok(userService.signUp(dto));
     }
 }
