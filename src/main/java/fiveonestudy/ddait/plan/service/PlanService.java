@@ -53,4 +53,19 @@ public class PlanService {
 
         return new PlanResponse(monthPlans, planList, checkList);
     }
+
+    public PlanResponse insertMonthlyPlan(String email, PlanMonthInsertRequest requestDto) {
+
+        // 🔹 1. Plan 저장
+        Plan plan = Plan.builder()
+                .email(email)
+                .date(requestDto.getDate())
+                .planContent(requestDto.getContent())
+                .build();
+
+        planRepository.save(plan);
+
+        // 🔹 2. 저장 후 해당 날짜 기준으로 다시 조회 (기존 로직 재사용)
+        return getPlan(email, requestDto.getDate());
+    }
 }
