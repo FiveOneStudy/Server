@@ -91,5 +91,19 @@ public class PlanService {
         return getPlan(email, requestDto.getDate());
     }
 
-    
+    public PlanResponse deleteMonthlyPlan(String email, PlanMonthInsertRequest requestDto) {
+
+        Plan plan = planRepository
+                .findByEmailAndDateAndPlanContent(
+                        email,
+                        requestDto.getDate(),
+                        requestDto.getContent()
+                )
+                .orElseThrow(() -> new RuntimeException("삭제할 일정이 없습니다."));
+
+        planRepository.delete(plan);
+
+        return getPlan(email, requestDto.getDate());
+    }
+
 }
