@@ -68,4 +68,28 @@ public class PlanService {
         // 🔹 2. 저장 후 해당 날짜 기준으로 다시 조회 (기존 로직 재사용)
         return getPlan(email, requestDto.getDate());
     }
+
+    public PlanResponse updateMonthlyPlan(String email, PlanMonthUpdateRequest requestDto) {
+
+        Plan plan = planRepository
+                .findByEmailAndDateAndPlanContent(
+                        email,
+                        requestDto.getDate(),
+                        requestDto.getOldContent()
+                )
+                .orElseThrow(() -> new RuntimeException("해당 일정이 존재하지 않습니다."));
+
+        Plan updatedPlan = Plan.builder()
+                .planId(plan.getPlanId())
+                .email(plan.getEmail())
+                .date(plan.getDate())
+                .planContent(requestDto.getNewContent())
+                .build();
+
+        planRepository.save(updatedPlan);
+
+        return getPlan(email, requestDto.getDate());
+    }
+
+    
 }
