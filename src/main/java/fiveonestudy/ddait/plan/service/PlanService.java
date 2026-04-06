@@ -106,4 +106,17 @@ public class PlanService {
         return getPlan(email, requestDto.getDate());
     }
 
+    public PlanResponse insertCheckList(String email, CheckListInsertRequest requestDto) {
+
+        CheckList check = CheckList.builder()
+                .email(email)
+                .date(requestDto.getDate())
+                .checkContent(requestDto.getContent())
+                .completed(false)
+                .build();
+
+        checkListRepository.save(check);
+
+        return getPlan(email, requestDto.getDate());
+    }
 }

@@ -1,10 +1,7 @@
 package fiveonestudy.ddait.plan.controller;
 
 import fiveonestudy.ddait.jwt.service.JwtService;
-import fiveonestudy.ddait.plan.dto.PlanMonthInsertRequest;
-import fiveonestudy.ddait.plan.dto.PlanMonthUpdateRequest;
-import fiveonestudy.ddait.plan.dto.PlanRequest;
-import fiveonestudy.ddait.plan.dto.PlanResponse;
+import fiveonestudy.ddait.plan.dto.*;
 import fiveonestudy.ddait.plan.service.PlanService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -92,4 +89,21 @@ public class PlanController {
         return planService.deleteMonthlyPlan(email, requestDto);
     }
 
+    @PostMapping("/check/insert")
+    public PlanResponse insertCheckList(
+            HttpServletRequest request,
+            @RequestBody CheckListInsertRequest requestDto
+    ) {
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
+
+        if (!jwtService.isTokenValid(accessToken)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+
+        String email = jwtService.extractEmail(accessToken)
+                .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
+
+        return planService.insertCheckList(email, requestDto);
+    }
 }
