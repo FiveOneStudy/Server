@@ -11,6 +11,5 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
 
     List<Plan> findByEmailAndDate(String email, LocalDate date);
     List<Plan> findByEmailAndDateBetween(String email, LocalDate startDate, LocalDate endDate);
-
     Optional<Plan> findByEmailAndDateAndPlanContent(String email, LocalDate date, String content);
 }

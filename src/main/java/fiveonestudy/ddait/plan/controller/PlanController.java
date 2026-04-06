@@ -7,8 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @RestController
 @RequestMapping("/plan")
 @RequiredArgsConstructor

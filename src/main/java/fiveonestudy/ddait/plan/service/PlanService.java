@@ -19,21 +19,18 @@ public class PlanService {
 
     public PlanResponse getPlan(String email, LocalDate date) {
 
-        // 🔹 하루 plan
         List<Plan> dailyPlans = planRepository.findByEmailAndDate(email, date);
 
         List<String> planList = dailyPlans.stream()
                 .map(Plan::getPlanContent)
                 .toList();
 
-        // 🔹 하루 checkList
         List<CheckList> checks = checkListRepository.findByEmailAndDate(email, date);
 
         List<CheckItem> checkList = checks.stream()
                 .map(c -> new CheckItem(c.getCheckContent(), c.isCompleted()))
                 .toList();
 
-        // 🔹 월간 plan
         LocalDate start = date.withDayOfMonth(1);
         LocalDate end = date.withDayOfMonth(date.lengthOfMonth());
 
@@ -56,7 +53,6 @@ public class PlanService {
 
     public PlanResponse insertMonthlyPlan(String email, PlanMonthInsertRequest requestDto) {
 
-        // 🔹 1. Plan 저장
         Plan plan = Plan.builder()
                 .email(email)
                 .date(requestDto.getDate())
@@ -65,7 +61,6 @@ public class PlanService {
 
         planRepository.save(plan);
 
-        // 🔹 2. 저장 후 해당 날짜 기준으로 다시 조회 (기존 로직 재사용)
         return getPlan(email, requestDto.getDate());
     }
 
@@ -168,7 +163,6 @@ public class PlanService {
                 )
                 .orElseThrow(() -> new RuntimeException("해당 체크리스트가 없습니다."));
 
-        // 🔥 false → true 변경
         check.updateCompleted(true);
 
         checkListRepository.save(check);
