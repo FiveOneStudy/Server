@@ -2,7 +2,6 @@ package fiveonestudy.ddait.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,20 +23,19 @@ public class User {
     private String email;
 
     private String password;
+
+    @Column(nullable = false)
     private String nickname;
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     private String refreshToken;
 
-    public void authorizeUser() {
-        this.role = Role.USER;
-    }
-
-    public void passwordEncode(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
+    public void setProfileImageUrl(String url) {
+        this.imageUrl = url;
     }
 
     public void updateRefreshToken(String updateRefreshToken) {
