@@ -1,7 +1,9 @@
 package fiveonestudy.ddait.plan.controller;
 
+import fiveonestudy.ddait.jwt.service.JwtService;
 import fiveonestudy.ddait.plan.dto.PlanResponse;
 import fiveonestudy.ddait.plan.service.PlanService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,12 +15,23 @@ import java.time.LocalDate;
 public class PlanController {
 
     private final PlanService planService;
+    private final JwtService jwtService;
 
     @GetMapping
     public PlanResponse getPlan(
-            @RequestParam String email,
+            HttpServletRequest request,
             @RequestParam LocalDate date
     ) {
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
+
+        if (!jwtService.isTokenValid(accessToken)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+
+        String email = jwtService.extractEmail(accessToken)
+                .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
+
         return planService.getPlan(email, date);
     }
 }
