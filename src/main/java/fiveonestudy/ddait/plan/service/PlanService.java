@@ -143,5 +143,18 @@ public class PlanService {
         return getPlan(email, requestDto.getDate());
     }
 
+    public PlanResponse deleteCheckList(String email, CheckListInsertRequest requestDto) {
 
+        CheckList check = checkListRepository
+                .findByEmailAndDateAndCheckContent(
+                        email,
+                        requestDto.getDate(),
+                        requestDto.getContent()
+                )
+                .orElseThrow(() -> new RuntimeException("삭제할 체크리스트가 없습니다."));
+
+        checkListRepository.delete(check);
+
+        return getPlan(email, requestDto.getDate());
+    }
 }

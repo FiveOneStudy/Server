@@ -125,4 +125,21 @@ public class PlanController {
         return planService.updateCheckList(email, requestDto);
     }
 
+    @DeleteMapping("/check/delete")
+    public PlanResponse deleteCheckList(
+            HttpServletRequest request,
+            @RequestBody CheckListInsertRequest requestDto
+    ) {
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
+
+        if (!jwtService.isTokenValid(accessToken)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+
+        String email = jwtService.extractEmail(accessToken)
+                .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
+
+        return planService.deleteCheckList(email, requestDto);
+    }
 }
