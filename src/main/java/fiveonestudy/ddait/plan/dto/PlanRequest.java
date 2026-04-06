@@ -8,6 +8,5 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 public class PlanRequest {
-    private String email;
     private LocalDate date;
 }

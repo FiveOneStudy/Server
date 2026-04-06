@@ -1,6 +1,7 @@
 package fiveonestudy.ddait.plan.controller;
 
 import fiveonestudy.ddait.jwt.service.JwtService;
+import fiveonestudy.ddait.plan.dto.PlanRequest;
 import fiveonestudy.ddait.plan.dto.PlanResponse;
 import fiveonestudy.ddait.plan.service.PlanService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,10 +18,10 @@ public class PlanController {
     private final PlanService planService;
     private final JwtService jwtService;
 
-    @GetMapping
+    @PostMapping
     public PlanResponse getPlan(
             HttpServletRequest request,
-            @RequestParam LocalDate date
+            @RequestBody PlanRequest planRequest
     ) {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
@@ -32,6 +33,6 @@ public class PlanController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
 
-        return planService.getPlan(email, date);
+        return planService.getPlan(email, planRequest.getDate());
     }
 }
