@@ -1,6 +1,8 @@
 package fiveonestudy.ddait.jwt.filter;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fiveonestudy.ddait.jwt.dto.TokenDto;
 import fiveonestudy.ddait.jwt.service.JwtService;
 import fiveonestudy.ddait.user.entity.User;
 import fiveonestudy.ddait.user.repository.UserRepository;
@@ -34,6 +36,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         if (isNoCheckUrl(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
@@ -56,6 +59,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private static final String[] NO_CHECK_URLS = {
             "/login",
+            "/signup",
             "/oauth2/authorization",
             "/login/oauth2/code"
     };
@@ -65,13 +69,20 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 .anyMatch(uri::startsWith);
     }
 
-    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        userRepository.findByRefreshToken(refreshToken)
-                .ifPresent(user -> {
-                    String reIssuedRefreshToken = reIssueRefreshToken(user);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail()),
-                            reIssuedRefreshToken);
-                });
+    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) throws IOException {
+
+        User user = userRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
+
+        TokenDto token = jwtService.issueToken(user.getEmail());
+
+        user.updateRefreshToken(token.refreshToken());
+        userRepository.saveAndFlush(user);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        new ObjectMapper().writeValue(response.getWriter(), token);
     }
 
 
