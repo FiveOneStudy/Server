@@ -11,6 +11,7 @@ import fiveonestudy.ddait.oauth.handler.OAuth2LoginFailureHandler;
 import fiveonestudy.ddait.oauth.handler.OAuth2LoginSuccessHandler;
 import fiveonestudy.ddait.oauth.service.CustomOAuth2UserService;
 import fiveonestudy.ddait.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,7 +45,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           AuthenticationManager authenticationManager, LoginService loginService) throws Exception {
+                                           AuthenticationManager authenticationManager, LoginService loginService, CustomJsonUsernamePasswordAuthenticationFilter customFilter, JwtAuthenticationProcessingFilter jwtFilter) throws Exception {
 
         http
                 .formLogin(form -> form.disable())
@@ -58,7 +59,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**").permitAll()
-                        .requestMatchers("/auth/login", "/auth/signup").permitAll()
+                        .requestMatchers("/login", "/signup").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -67,33 +68,36 @@ public class SecurityConfig {
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
                         .userInfoEndpoint(user -> user.userService(customOAuth2UserService))
+                )
+
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"message\": \"Unauthorized\"}");
+                        })
                 );
 
-        http.addFilterAfter(
-                customJsonUsernamePasswordAuthenticationFilter(authenticationManager),
-                LogoutFilter.class
-        );
+        http.authenticationProvider(daoAuthenticationProvider(loginService, passwordEncoder));
 
-        http.addFilterBefore(
-                jwtAuthenticationProcessingFilter(),
-                CustomJsonUsernamePasswordAuthenticationFilter.class
-        );
-
-        http.authenticationProvider(daoAuthenticationProvider(loginService));
+        http.addFilterAfter(customFilter, LogoutFilter.class);
+        http.addFilterBefore(jwtFilter, CustomJsonUsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
     public CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordAuthenticationFilter(
-            AuthenticationManager authenticationManager
+            AuthenticationManager authenticationManager,
+            LoginSuccessHandler loginSuccessHandler,
+            LoginFailureHandler loginFailureHandler
     ) {
         CustomJsonUsernamePasswordAuthenticationFilter filter =
                 new CustomJsonUsernamePasswordAuthenticationFilter(objectMapper);
 
         filter.setAuthenticationManager(authenticationManager);
-        filter.setAuthenticationSuccessHandler(loginSuccessHandler());
-        filter.setAuthenticationFailureHandler(loginFailureHandler());
+        filter.setAuthenticationSuccessHandler(loginSuccessHandler);
+        filter.setAuthenticationFailureHandler(loginFailureHandler);
 
         return filter;
     }
@@ -110,12 +114,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public LoginFailureHandler loginFailureHandler() {
-        return new LoginFailureHandler();
+    public LoginFailureHandler loginFailureHandler(ObjectMapper objectMapper) {
+        return new LoginFailureHandler(objectMapper);
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(LoginService loginService) {
+    public DaoAuthenticationProvider daoAuthenticationProvider(
+            LoginService loginService,
+            PasswordEncoder passwordEncoder
+    ) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(loginService);
         provider.setPasswordEncoder(passwordEncoder);
