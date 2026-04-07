@@ -46,6 +46,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 });
 
         log.info("로그인 성공: {}", email);
+        log.info("access token: {}", token.accessToken());
+        log.info("refresh token: {}", token.refreshToken());
     }
 
     private String extractUsername(Authentication authentication) {
