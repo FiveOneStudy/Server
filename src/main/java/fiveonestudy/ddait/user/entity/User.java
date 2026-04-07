@@ -24,9 +24,17 @@ public class User {
 
     private String password;
 
+    @Setter
     @Column(nullable = false)
     private String nickname;
-    private String imageUrl;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "profile_image", columnDefinition = "LONGBLOB")
+    private byte[] profileImage;
+
+    @Column(name = "profile_image_type")
+    private String profileImageType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -34,11 +42,12 @@ public class User {
 
     private String refreshToken;
 
-    public void setProfileImageUrl(String url) {
-        this.imageUrl = url;
-    }
-
     public void updateRefreshToken(String updateRefreshToken) {
         this.refreshToken = updateRefreshToken;
+    }
+
+    public void updateProfileImage(byte[] image, String contentType) {
+        this.profileImage = image;
+        this.profileImageType = contentType;
     }
 }
