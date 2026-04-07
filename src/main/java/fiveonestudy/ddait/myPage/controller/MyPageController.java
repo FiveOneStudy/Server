@@ -1,5 +1,8 @@
 package fiveonestudy.ddait.myPage.controller;
 
+import fiveonestudy.ddait.global.response.ApiResponse;
+import fiveonestudy.ddait.myPage.dto.NicknameResponse;
+import fiveonestudy.ddait.myPage.dto.ProfileImageResponse;
 import fiveonestudy.ddait.myPage.security.CustomUserDetails;
 import fiveonestudy.ddait.myPage.service.MyPageService;
 import fiveonestudy.ddait.user.entity.User;
@@ -9,13 +12,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal; // ← 수정됨
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/mypage")
@@ -26,39 +27,52 @@ public class MyPageController {
     private final UserRepository userRepository;
 
     @PatchMapping("/profile-image")
-    public ResponseEntity<?> updateProfileImage(
+    public ResponseEntity<ApiResponse<ProfileImageResponse>> updateProfileImage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart("image") MultipartFile image
     ) {
-        try {
-            String fileName = mypageService.updateProfileImage(userDetails.getId(), image);
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "data", Map.of("imageUrl", "/mypage/profile-image/view"),
-                    "error", null
-            ));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "data", null,
-                    "error", Map.of(
-                            "code", "INVALID_FILE",
-                            "message", e.getMessage()
-                    )
-            ));
-        }
+        mypageService.updateProfileImage(userDetails.getId(), image);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(new ProfileImageResponse("/mypage/profile-image"))
+        );
     }
 
-    @GetMapping("/profile-image/view")
-    public ResponseEntity<Resource> getProfileImage(
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) throws Exception {
-        User user = userRepository.findById(userDetails.getId()).orElseThrow();
-        Path filePath = Paths.get("uploads/profile-images").resolve(user.getImageUrl());
-        Resource resource = new UrlResource(filePath.toUri());
+    @GetMapping("/profile-image/{userId}")
+    public ResponseEntity<byte[]> getProfileImage(
+            @PathVariable Long userId
+    ) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        if (user.getProfileImage() == null) {
+            throw new IllegalArgumentException("PROFILE_IMAGE_NOT_FOUND");
+        }
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
-                .body(resource);
+                .header(HttpHeaders.CONTENT_TYPE, user.getProfileImageType())
+                .body(user.getProfileImage());
+    }
+
+
+    @PatchMapping("/profile-nickname")
+    public ResponseEntity<ApiResponse<NicknameResponse>> updateNickname(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody Map<String, String> body
+    ) {
+        try {
+            String nickname = body.get("nickname");
+            String updated = mypageService.updateNickname(userDetails.getId(), nickname);
+
+            return ResponseEntity.ok(
+                    ApiResponse.success(new NicknameResponse(updated))
+            );
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.fail("NICKNAME_DUPLICATE", "이미 사용 중인 닉네임입니다.")
+            );
+        }
     }
 }
