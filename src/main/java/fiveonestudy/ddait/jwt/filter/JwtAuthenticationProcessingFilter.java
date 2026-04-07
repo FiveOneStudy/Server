@@ -4,6 +4,7 @@ package fiveonestudy.ddait.jwt.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fiveonestudy.ddait.jwt.dto.TokenDto;
 import fiveonestudy.ddait.jwt.service.JwtService;
+import fiveonestudy.ddait.myPage.security.CustomUserDetails;
 import fiveonestudy.ddait.user.entity.User;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -17,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -106,23 +106,14 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     }
 
     public void saveAuthentication(User myUser) {
-        String password = myUser.getPassword();
 
-        if (password == null) {
-            password = passwordEncoder.encode(generateRandomPassword());
-        }
-
-        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
-                .username(myUser.getEmail())
-                .password(password)
-                .roles(myUser.getRole().name())
-                .build();
+        CustomUserDetails userDetails = new CustomUserDetails(myUser);
 
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(
-                        userDetailsUser,
+                        userDetails,
                         null,
-                        authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities())
+                        userDetails.getAuthorities()
                 );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
