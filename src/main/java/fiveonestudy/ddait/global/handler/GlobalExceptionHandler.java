@@ -1,4 +1,4 @@
-package fiveonestudy.ddait.handler;
+package fiveonestudy.ddait.global.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

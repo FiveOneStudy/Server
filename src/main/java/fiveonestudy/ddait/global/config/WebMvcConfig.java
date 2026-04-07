@@ -1,4 +1,4 @@
-package fiveonestudy.ddait.config;
+package fiveonestudy.ddait.global.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
