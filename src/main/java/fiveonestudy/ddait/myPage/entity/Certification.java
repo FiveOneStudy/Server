@@ -20,7 +20,4 @@ public class Certification {
 
     private Integer prize;
 
-    @Column(length = 50)
-    private String verifiedRule;
-
 }
