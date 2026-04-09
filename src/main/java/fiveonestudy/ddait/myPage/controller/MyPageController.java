@@ -31,6 +31,11 @@ public class MyPageController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart("image") MultipartFile image
     ) {
+
+        if (userDetails == null) {
+            throw new RuntimeException("UNAUTHORIZED");
+        }
+
         mypageService.updateProfileImage(userDetails.getId(), image);
 
         return ResponseEntity.ok(
@@ -39,12 +44,10 @@ public class MyPageController {
     }
 
     @GetMapping("/profile-image/{userId}")
-    public ResponseEntity<byte[]> getProfileImage(
-            @PathVariable Long userId
-    ) {
+    public ResponseEntity<byte[]> getProfileImage(@PathVariable Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
 
         if (user.getProfileImage() == null) {
             throw new IllegalArgumentException("PROFILE_IMAGE_NOT_FOUND");
@@ -55,24 +58,26 @@ public class MyPageController {
                 .body(user.getProfileImage());
     }
 
-
     @PatchMapping("/profile-nickname")
     public ResponseEntity<ApiResponse<NicknameResponse>> updateNickname(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody Map<String, String> body
     ) {
-        try {
-            String nickname = body.get("nickname");
-            String updated = mypageService.updateNickname(userDetails.getId(), nickname);
 
-            return ResponseEntity.ok(
-                    ApiResponse.success(new NicknameResponse(updated))
-            );
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(
-                    ApiResponse.fail("NICKNAME_DUPLICATE", "이미 사용 중인 닉네임입니다.")
-            );
+        if (userDetails == null) {
+            throw new RuntimeException("UNAUTHORIZED");
         }
+
+        String nickname = body.get("nickname");
+
+        if (nickname == null || nickname.isBlank()) {
+            throw new IllegalArgumentException("INVALID_REQUEST");
+        }
+
+        String updated = mypageService.updateNickname(userDetails.getId(), nickname);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(new NicknameResponse(updated))
+        );
     }
 }
