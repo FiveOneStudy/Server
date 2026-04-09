@@ -50,4 +50,8 @@ public class User {
         this.profileImage = image;
         this.profileImageType = contentType;
     }
+
+    public Boolean isAdmin() {
+        return role.equals(Role.ADMIN);
+    }
 }
