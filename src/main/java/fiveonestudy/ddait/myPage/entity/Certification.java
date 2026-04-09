@@ -6,6 +6,8 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Builder
+@AllArgsConstructor
 @Table(name = "certifications", uniqueConstraints = @UniqueConstraint(name = "uk_cert_name", columnNames = "name"))
 public class Certification {
     @Id
@@ -19,5 +21,11 @@ public class Certification {
     private String issuer;
 
     private Integer prize;
+
+    public Certification(String name, String issuer, Integer prize) {
+        this.name = name;
+        this.issuer = issuer;
+        this.prize = prize;
+    }
 
 }

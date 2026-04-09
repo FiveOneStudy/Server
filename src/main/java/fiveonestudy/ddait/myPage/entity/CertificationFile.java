@@ -1,16 +1,11 @@
 package fiveonestudy.ddait.myPage.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
-@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
 @Table(name = "certification_files")
 public class CertificationFile {
 
@@ -22,13 +17,20 @@ public class CertificationFile {
     @JoinColumn(name = "user_certification_id", nullable = false)
     private UserCertification userCertification;
 
+    @Lob
     @Column(nullable = false)
-    private String fileUrl;
+    private byte[] fileData;
 
     private String originalName;
 
+    @Column(nullable = false)
     private String contentType;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+
+    public CertificationFile(UserCertification userCertification, byte[] fileData, String originalName, String contentType) {
+        this.userCertification = userCertification;
+        this.fileData = fileData;
+        this.originalName = originalName;
+        this.contentType = contentType;
+    }
 }
