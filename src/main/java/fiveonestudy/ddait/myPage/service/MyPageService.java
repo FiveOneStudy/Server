@@ -3,7 +3,6 @@ package fiveonestudy.ddait.myPage.service;
 import fiveonestudy.ddait.user.entity.User;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
