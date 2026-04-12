@@ -22,7 +22,7 @@ public class AdminCertificationService {
 
     @Transactional(readOnly = true)
     public List<UserCertification> getPendingList() {
-        return userCertificationRepository.findByStatus(CertificationStatus.PENDING);
+        return userCertificationRepository.findByStatusOrderById(CertificationStatus.PENDING);
     }
 
     public void approve(Long userCertificationId, CustomUserDetails adminDetails) {

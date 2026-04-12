@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface UserCertificationRepository extends JpaRepository<UserCertification, Long> {
     List<UserCertification> findByUserId(Long userId);
-    List<UserCertification> findByStatus(CertificationStatus status);
+    List<UserCertification> findByStatusOrderById(CertificationStatus status);
 }
