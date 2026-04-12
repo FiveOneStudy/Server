@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -26,6 +25,22 @@ public class UserCertificationService {
 
     public Long register(User user, CertificationRequest request, MultipartFile file) throws Exception {
 
+        if (user == null) {
+            throw new RuntimeException("UNAUTHORIZED");
+        }
+
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new IllegalArgumentException("INVALID_REQUEST");
+        }
+
+        if (request.getIssuer() == null || request.getIssuer().isBlank()) {
+            throw new IllegalArgumentException("INVALID_REQUEST");
+        }
+
+        if (request.getAcquiredDate() == null) {
+            throw new IllegalArgumentException("INVALID_REQUEST");
+        }
+
         if (file.isEmpty()) {
             throw new RuntimeException("파일 필수");
         }
@@ -34,8 +49,10 @@ public class UserCertificationService {
             throw new RuntimeException("파일 크기 초과 (5MB)");
         }
 
-        if (!file.getContentType().equals("application/pdf") &&
-                !file.getContentType().startsWith("image/")) {
+        String contentType = file.getContentType();
+        if (contentType == null ||
+                (!contentType.equals("application/pdf") &&
+                        !contentType.startsWith("image/"))) {
             throw new RuntimeException("INVALID_FILE_TYPE");
         }
 
@@ -57,7 +74,7 @@ public class UserCertificationService {
                 uc,
                 file.getBytes(),
                 file.getOriginalFilename(),
-                file.getContentType()
+                contentType
         );
 
         certificationFileRepository.save(certFile);
