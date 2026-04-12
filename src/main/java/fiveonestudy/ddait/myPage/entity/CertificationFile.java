@@ -18,7 +18,7 @@ public class CertificationFile {
     private UserCertification userCertification;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGBLOB")
     private byte[] fileData;
 
     private String originalName;
