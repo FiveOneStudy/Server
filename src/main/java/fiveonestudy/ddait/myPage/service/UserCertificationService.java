@@ -86,4 +86,22 @@ public class UserCertificationService {
     public List<UserCertification> getMyCertifications(Long userId) {
         return userCertificationRepository.findByUserId(userId);
     }
+
+    public void delete(Long userId, Long certificationId) {
+        UserCertification uc = userCertificationRepository.findById(certificationId)
+                .orElseThrow(()-> new RuntimeException("자격증 없음"));
+
+        if (!uc.getUser().getId().equals(userId)) {
+            throw new RuntimeException("FORBIDDEN");
+        }
+
+        certificationFileRepository.deleteByUserCertification(uc);
+
+        userCertificationRepository.delete(uc);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Certification> getAllCertifications() {
+        return certificationRepository.findAll();
+    }
 }

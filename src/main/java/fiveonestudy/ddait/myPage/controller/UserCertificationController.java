@@ -2,6 +2,7 @@ package fiveonestudy.ddait.myPage.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fiveonestudy.ddait.global.response.ApiResponse;
+import fiveonestudy.ddait.myPage.dto.CertificationListResponse;
 import fiveonestudy.ddait.myPage.dto.CertificationRequest;
 import fiveonestudy.ddait.myPage.dto.CertificationResponse;
 import fiveonestudy.ddait.myPage.security.CustomUserDetails;
@@ -57,6 +58,32 @@ public class UserCertificationController {
                 userCertificationService.getMyCertifications(userDetails.getId())
                         .stream()
                         .map(CertificationResponse::from)
+                        .toList();
+
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteCertification(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            throw new RuntimeException("UNAUTHORIZED");
+        }
+
+        userCertificationService.delete(userDetails.getId(), id);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<List<CertificationListResponse>>> getAllCertifications() {
+
+        List<CertificationListResponse> result =
+                userCertificationService.getAllCertifications()
+                        .stream()
+                        .map(CertificationListResponse::from)
                         .toList();
 
         return ResponseEntity.ok(ApiResponse.success(result));
