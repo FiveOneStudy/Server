@@ -1,6 +1,7 @@
 package fiveonestudy.ddait.myPage.controller;
 
 import fiveonestudy.ddait.global.response.ApiResponse;
+import fiveonestudy.ddait.myPage.dto.MyPageResponse;
 import fiveonestudy.ddait.myPage.dto.NicknameResponse;
 import fiveonestudy.ddait.myPage.dto.ProfileImageResponse;
 import fiveonestudy.ddait.myPage.security.CustomUserDetails;
@@ -79,5 +80,19 @@ public class MyPageController {
         return ResponseEntity.ok(
                 ApiResponse.success(new NicknameResponse(updated))
         );
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+
+        if (userDetails == null) {
+            throw new RuntimeException("UNAUTHORIZED");
+        }
+
+        MyPageResponse result = mypageService.getMyPage(userDetails.getId());
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 }

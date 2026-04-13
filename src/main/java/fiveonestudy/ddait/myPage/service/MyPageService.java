@@ -1,5 +1,8 @@
 package fiveonestudy.ddait.myPage.service;
 
+import fiveonestudy.ddait.myPage.dto.CertificationResponse;
+import fiveonestudy.ddait.myPage.dto.MyPageResponse;
+import fiveonestudy.ddait.myPage.repository.UserCertificationRepository;
 import fiveonestudy.ddait.user.entity.User;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,7 @@ public class MyPageService {
 
     private static final long MAX_FILE_SIZE = 5*1024*1024;
     private static final List<String> ALLOWED_TYPES = List.of("image/jpeg", "image/png", "image/jpg");
+    private final UserCertificationRepository userCertificationRepository;
 
     @Transactional
     public void updateProfileImage(Long userId, MultipartFile image) {
@@ -46,6 +50,25 @@ public class MyPageService {
                 .orElseThrow(()-> new RuntimeException("유저를 찾을 수 없습니다."));
         user.setNickname(nickname);
         return nickname;
+    }
+
+    @Transactional(readOnly = true)
+    public MyPageResponse getMyPage(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        List<CertificationResponse> certs =
+                userCertificationRepository.findByUserId(userId)
+                        .stream()
+                        .map(CertificationResponse::from)
+                        .toList();
+
+        return MyPageResponse.builder()
+                .nickname(user.getNickname())
+                .profileImageUrl("/mypage/profile-image/" + userId)
+                .certifications(certs)
+                .build();
     }
 
 }
