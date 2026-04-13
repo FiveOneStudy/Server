@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface UserStudyRepository extends JpaRepository<UserStudy, Long> {
     List<UserStudy> findByUserName(String userName);
     Optional<UserStudy> findByUserNameAndStudyName(String userName, String studyName);
+    void deleteByUserNameAndStudyName(String userName, String studyName);
 }

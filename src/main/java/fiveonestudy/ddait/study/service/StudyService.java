@@ -90,4 +90,16 @@ public class StudyService {
                 .answer(true)
                 .build();
     }
+
+    public StudyJoinResponse leaveStudy(String userName, StudyJoinRequest request) {
+
+        userStudyRepository.deleteByUserNameAndStudyName(
+                userName,
+                request.getStudyName()
+        );
+
+        return StudyJoinResponse.builder()
+                .answer(true)
+                .build();
+    }
 }
