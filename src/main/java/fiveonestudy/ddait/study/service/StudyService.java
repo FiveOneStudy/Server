@@ -1,7 +1,10 @@
 package fiveonestudy.ddait.study.service;
 
+import fiveonestudy.ddait.study.dto.StudyJoinRequest;
+import fiveonestudy.ddait.study.dto.StudyJoinResponse;
 import fiveonestudy.ddait.study.dto.StudyResponse;
 import fiveonestudy.ddait.study.entity.Study;
+import fiveonestudy.ddait.study.entity.UserStudy;
 import fiveonestudy.ddait.study.repository.StudyRepository;
 import fiveonestudy.ddait.study.repository.UserStudyRepository;
 import lombok.RequiredArgsConstructor;
@@ -65,5 +68,26 @@ public class StudyService {
         // 미래: 양수 (남은 일수)
         // 오늘: 0
         // 과거: 음수
+    }
+
+    public StudyJoinResponse joinStudy(String userName, StudyJoinRequest request) {
+
+        // 🔥 중복 가입 방지
+        boolean exists = userStudyRepository
+                .findByUserNameAndStudyName(userName, request.getStudyName())
+                .isPresent();
+
+        if (!exists) {
+            UserStudy userStudy = UserStudy.builder()
+                    .userName(userName)
+                    .studyName(request.getStudyName())
+                    .build();
+
+            userStudyRepository.save(userStudy);
+        }
+
+        return StudyJoinResponse.builder()
+                .answer(true)
+                .build();
     }
 }
