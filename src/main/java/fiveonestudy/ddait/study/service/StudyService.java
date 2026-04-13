@@ -1,13 +1,13 @@
 package fiveonestudy.ddait.study.service;
 
-import fiveonestudy.ddait.study.dto.StudyJoinRequest;
-import fiveonestudy.ddait.study.dto.StudyJoinResponse;
-import fiveonestudy.ddait.study.dto.StudyResponse;
+import fiveonestudy.ddait.study.dto.*;
 import fiveonestudy.ddait.study.entity.Study;
 import fiveonestudy.ddait.study.entity.StudyRequest;
+import fiveonestudy.ddait.study.entity.StudyTip;
 import fiveonestudy.ddait.study.entity.UserStudy;
 import fiveonestudy.ddait.study.repository.StudyRepository;
 import fiveonestudy.ddait.study.repository.StudyRequestRepository;
+import fiveonestudy.ddait.study.repository.StudyTipRepository;
 import fiveonestudy.ddait.study.repository.UserStudyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +27,7 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final UserStudyRepository userStudyRepository;
     private final StudyRequestRepository studyRequestRepository;
+    private final StudyTipRepository studyTipRepository;
 
     public StudyResponse getStudy(String userName) {
 
@@ -124,6 +125,23 @@ public class StudyService {
         }
 
         return StudyJoinResponse.builder()
+                .answer(true)
+                .build();
+    }
+
+    public StudyTipResponse insertTip(String email, StudyTipInsertRequest request) {
+
+        StudyTip tip = StudyTip.builder()
+                .studyName(request.getStudyName())
+                .writer(request.getWriter())
+                .title(request.getTitle())
+                .createdDate(LocalDate.now().toString()) // 🔥 서버 기준 오늘 날짜
+                .content(request.getContent())
+                .build();
+
+        studyTipRepository.save(tip);
+
+        return StudyTipResponse.builder()
                 .answer(true)
                 .build();
     }
