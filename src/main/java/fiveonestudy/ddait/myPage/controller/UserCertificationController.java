@@ -5,9 +5,12 @@ import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.myPage.dto.CertificationListResponse;
 import fiveonestudy.ddait.myPage.dto.CertificationRequest;
 import fiveonestudy.ddait.myPage.dto.CertificationResponse;
+import fiveonestudy.ddait.myPage.entity.CertificationFile;
+import fiveonestudy.ddait.myPage.repository.CertificationFileRepository;
 import fiveonestudy.ddait.myPage.security.CustomUserDetails;
 import fiveonestudy.ddait.myPage.service.UserCertificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +27,7 @@ public class UserCertificationController {
 
     private final UserCertificationService userCertificationService;
     private final ObjectMapper objectMapper;
+    private final CertificationFileRepository certificationFileRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Map<String, String>>> register(
@@ -87,5 +91,25 @@ public class UserCertificationController {
                         .toList();
 
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/{id}/file")
+    public ResponseEntity<byte[]> getCertificationFile(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            throw new RuntimeException("UNAUTHORIZED");
+        }
+
+        CertificationFile file = certificationFileRepository.findByUserCertificationId(id)
+                .orElseThrow(()-> new RuntimeException("FILE_NOT_FOUND"));
+
+        if (!file.getUserCertification().getUser().getId().equals(userDetails.getId())
+                && !userDetails.getUser().isAdmin()) {
+            throw new RuntimeException("FORBIDDEN");
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getOriginalName() + "\"")
+                .body(file.getFileData());
     }
 }
