@@ -146,4 +146,18 @@ public class StudyService {
                 .answer(true)
                 .build();
     }
+
+    public StudyTipReadResponse readTip(String email, StudyTipReadRequest request) {
+
+        StudyTip tip = studyTipRepository.findById(request.getStudyId())
+                .orElseThrow(() -> new RuntimeException("해당 글이 없습니다."));
+
+        return StudyTipReadResponse.builder()
+                .title(tip.getTitle())
+                .writer(tip.getWriter())
+                .date(tip.getCreatedDate())
+                .content(tip.getContent())
+                .url(tip.getUrl()) // 🔥 리스트 그대로 반환
+                .build();
+    }
 }

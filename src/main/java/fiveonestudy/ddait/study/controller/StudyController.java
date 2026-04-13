@@ -106,4 +106,23 @@ public class StudyController {
 
         return studyService.insertTip(email, requestDto);
     }
+
+    @GetMapping("/read")
+    public StudyTipReadResponse readTip(
+            HttpServletRequest request,
+            @RequestBody StudyTipReadRequest requestDto
+    ) {
+
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
+
+        if (!jwtService.isTokenValid(accessToken)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+
+        String email = jwtService.extractEmail(accessToken)
+                .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
+
+        return studyService.readTip(email, requestDto);
+    }
 }
