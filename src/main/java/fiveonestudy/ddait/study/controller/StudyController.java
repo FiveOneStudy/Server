@@ -107,7 +107,7 @@ public class StudyController {
         return studyService.insertTip(email, requestDto);
     }
 
-    @GetMapping("/read")
+    @PostMapping("/read")
     public StudyTipReadResponse readTip(
             HttpServletRequest request,
             @RequestBody StudyTipReadRequest requestDto
