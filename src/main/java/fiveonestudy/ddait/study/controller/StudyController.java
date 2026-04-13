@@ -34,7 +34,7 @@ public class StudyController {
     @PostMapping("/in")
     public StudyJoinResponse joinStudy(
             HttpServletRequest request,
-            @RequestBody StudyJoinRequest requestDto
+            @RequestBody StudyNameRequest requestDto
     ) {
 
         String accessToken = jwtService.extractAccessToken(request)
@@ -53,7 +53,7 @@ public class StudyController {
     @DeleteMapping("/out")
     public StudyJoinResponse leaveStudy(
             HttpServletRequest request,
-            @RequestBody StudyJoinRequest requestDto
+            @RequestBody StudyNameRequest requestDto
     ) {
 
         String accessToken = jwtService.extractAccessToken(request)
@@ -72,7 +72,7 @@ public class StudyController {
     @PostMapping("/request")
     public StudyJoinResponse requestStudy(
             HttpServletRequest request,
-            @RequestBody StudyJoinRequest requestDto
+            @RequestBody StudyNameRequest requestDto
     ) {
 
         String accessToken = jwtService.extractAccessToken(request)
@@ -124,5 +124,26 @@ public class StudyController {
                 .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
 
         return studyService.readTip(email, requestDto);
+    }
+
+    @PostMapping("/tip")
+    public StudyTipListResponse getTips(
+            HttpServletRequest request,
+            @RequestBody StudyNameRequest requestDto
+    ) {
+        // 1. 토큰 추출 및 검증
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
+
+        if (!jwtService.isTokenValid(accessToken)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+
+        // 2. 이메일 추출
+        String email = jwtService.extractEmail(accessToken)
+                .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
+
+        // 3. 서비스 호출 (email과 requestDto를 모두 전달)
+        return studyService.getTips(email, requestDto);
     }
 }

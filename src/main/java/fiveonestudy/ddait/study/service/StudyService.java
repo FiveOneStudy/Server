@@ -15,9 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +77,7 @@ public class StudyService {
         // 과거: 음수
     }
 
-    public StudyJoinResponse joinStudy(String userName, StudyJoinRequest request) {
+    public StudyJoinResponse joinStudy(String userName, StudyNameRequest request) {
 
         // 🔥 중복 가입 방지
         boolean exists = userStudyRepository
@@ -97,7 +98,7 @@ public class StudyService {
                 .build();
     }
 
-    public StudyJoinResponse leaveStudy(String userName, StudyJoinRequest request) {
+    public StudyJoinResponse leaveStudy(String userName, StudyNameRequest request) {
 
         userStudyRepository.deleteByUserNameAndStudyName(
                 userName,
@@ -109,7 +110,7 @@ public class StudyService {
                 .build();
     }
 
-    public StudyJoinResponse requestStudy(String userName, StudyJoinRequest request) {
+    public StudyJoinResponse requestStudy(String userName, StudyNameRequest request) {
 
         boolean exists = studyRequestRepository
                 .findByUserNameAndStudyName(userName, request.getStudyName())
@@ -159,5 +160,21 @@ public class StudyService {
                 .content(tip.getContent())
                 .url(tip.getUrl())
                 .build();
+    }
+
+    public StudyTipListResponse getTips(String email, StudyNameRequest requestDto) { // 파라미터 수정
+
+        List<StudyTip> tips = studyTipRepository.findByStudyName(requestDto.getStudyName());
+
+        List<List<Object>> tipList = tips.stream()
+                .map(tip -> Arrays.<Object>asList(
+                        tip.getId(),
+                        tip.getTitle(),
+                        tip.getWriter(),
+                        tip.getCreatedDate() != null ? tip.getCreatedDate().toString() : ""
+                ))
+                .collect(Collectors.toList());
+
+        return new StudyTipListResponse(tipList);
     }
 }
