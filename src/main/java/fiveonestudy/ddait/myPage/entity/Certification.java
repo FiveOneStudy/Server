@@ -20,6 +20,8 @@ public class Certification {
     @Column(nullable = false, length = 100)
     private String issuer;
 
+    @Column(length = 50)
+    private String title;
 
     public Certification(String name, String issuer, Integer prize) {
         this.name = name;
