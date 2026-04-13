@@ -2,13 +2,12 @@ package fiveonestudy.ddait.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Builder
-@Table(name = "USERS")
+@Table(name = "users")
 @AllArgsConstructor
 public class User {
 
@@ -24,23 +23,35 @@ public class User {
     private String email;
 
     private String password;
+
+    @Setter
+    @Column(nullable = false)
     private String nickname;
-    private String imageUrl;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "profile_image", columnDefinition = "LONGBLOB")
+    private byte[] profileImage;
+
+    @Column(name = "profile_image_type")
+    private String profileImageType;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     private String refreshToken;
 
-    public void authorizeUser() {
-        this.role = Role.USER;
-    }
-
-    public void passwordEncode(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
-    }
-
     public void updateRefreshToken(String updateRefreshToken) {
         this.refreshToken = updateRefreshToken;
+    }
+
+    public void updateProfileImage(byte[] image, String contentType) {
+        this.profileImage = image;
+        this.profileImageType = contentType;
+    }
+
+    public Boolean isAdmin() {
+        return role.equals(Role.ADMIN);
     }
 }

@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByRefreshToken(String refreshToken);
 
-    Optional<User> findByOauthId(String oauthId);
+    Optional<User> findByid(Long id);
 
     boolean existsByEmail(String email);
 
