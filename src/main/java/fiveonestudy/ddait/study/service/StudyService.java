@@ -4,8 +4,10 @@ import fiveonestudy.ddait.study.dto.StudyJoinRequest;
 import fiveonestudy.ddait.study.dto.StudyJoinResponse;
 import fiveonestudy.ddait.study.dto.StudyResponse;
 import fiveonestudy.ddait.study.entity.Study;
+import fiveonestudy.ddait.study.entity.StudyRequest;
 import fiveonestudy.ddait.study.entity.UserStudy;
 import fiveonestudy.ddait.study.repository.StudyRepository;
+import fiveonestudy.ddait.study.repository.StudyRequestRepository;
 import fiveonestudy.ddait.study.repository.UserStudyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class StudyService {
 
     private final StudyRepository studyRepository;
     private final UserStudyRepository userStudyRepository;
+    private final StudyRequestRepository studyRequestRepository;
 
     public StudyResponse getStudy(String userName) {
 
@@ -99,6 +102,26 @@ public class StudyService {
                 userName,
                 request.getStudyName()
         );
+
+        return StudyJoinResponse.builder()
+                .answer(true)
+                .build();
+    }
+
+    public StudyJoinResponse requestStudy(String userName, StudyJoinRequest request) {
+
+        boolean exists = studyRequestRepository
+                .findByUserNameAndStudyName(userName, request.getStudyName())
+                .isPresent();
+
+        if (!exists) {
+            StudyRequest studyRequest = StudyRequest.builder()
+                    .userName(userName)
+                    .studyName(request.getStudyName())
+                    .build();
+
+            studyRequestRepository.save(studyRequest);
+        }
 
         return StudyJoinResponse.builder()
                 .answer(true)
