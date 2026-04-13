@@ -12,4 +12,7 @@ public class StudyTipInsertRequest {
     private String title;
     private String writer;
     private String content;
+
+    // 🔥 추가
+    private String bookUrl;
 }

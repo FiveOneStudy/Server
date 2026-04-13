@@ -135,8 +135,9 @@ public class StudyService {
                 .studyName(request.getStudyName())
                 .writer(request.getWriter())
                 .title(request.getTitle())
-                .createdDate(LocalDate.now().toString()) // 🔥 서버 기준 오늘 날짜
+                .createdDate(LocalDate.now().toString()) // 서버 날짜
                 .content(request.getContent())
+                .bookUrl(request.getBookUrl()) // 🔥 추가
                 .build();
 
         studyTipRepository.save(tip);

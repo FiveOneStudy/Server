@@ -25,4 +25,7 @@ public class StudyTip {
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    // 🔥 추가
+    private String bookUrl;
 }
