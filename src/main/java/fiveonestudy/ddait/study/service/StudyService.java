@@ -1,0 +1,69 @@
+package fiveonestudy.ddait.study.service;
+
+import fiveonestudy.ddait.study.dto.StudyResponse;
+import fiveonestudy.ddait.study.entity.Study;
+import fiveonestudy.ddait.study.repository.StudyRepository;
+import fiveonestudy.ddait.study.repository.UserStudyRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class StudyService {
+
+    private final StudyRepository studyRepository;
+    private final UserStudyRepository userStudyRepository;
+
+    public StudyResponse getStudy(String userName) {
+
+        // studyName → date 매핑
+        Map<String, String> studyDateMap = studyRepository.findAll()
+                .stream()
+                .collect(Collectors.toMap(
+                        Study::getName,
+                        Study::getDate
+                ));
+
+        // 내가 가입한 스터디 + dday 계산
+        List<StudyResponse.MyStudy> myStudies =
+                userStudyRepository.findByUserName(userName)
+                        .stream()
+                        .map(us -> {
+                            String date = studyDateMap.get(us.getStudyName());
+                            int dday = calculateDday(date);
+
+                            return new StudyResponse.MyStudy(
+                                    us.getStudyName(),
+                                    dday
+                            );
+                        })
+                        .collect(Collectors.toList());
+
+        // 전체 스터디 목록
+        List<String> allStudies = studyDateMap.keySet()
+                .stream()
+                .toList();
+
+        return StudyResponse.builder()
+                .study(myStudies)
+                .allStudy(allStudies)
+                .build();
+    }
+
+    // 🔥 숫자 D-day 반환
+    private int calculateDday(String dateStr) {
+        LocalDate today = LocalDate.now();
+        LocalDate examDate = LocalDate.parse(dateStr); // "yyyy-MM-dd"
+
+        return (int) ChronoUnit.DAYS.between(today, examDate);
+        // 미래: 양수 (남은 일수)
+        // 오늘: 0
+        // 과거: 음수
+    }
+}
