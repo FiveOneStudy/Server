@@ -9,6 +9,7 @@ import fiveonestudy.ddait.study.repository.StudyRepository;
 import fiveonestudy.ddait.study.repository.UserStudyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StudyService {
 
     private final StudyRepository studyRepository;
