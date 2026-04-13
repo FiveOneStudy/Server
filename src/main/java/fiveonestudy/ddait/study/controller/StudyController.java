@@ -88,7 +88,7 @@ public class StudyController {
         return studyService.requestStudy(email, requestDto);
     }
 
-    @PostMapping("/insert")
+    @PostMapping("/tip/insert")
     public StudyTipResponse insertTip(
             HttpServletRequest request,
             @RequestBody StudyTipInsertRequest requestDto
@@ -107,7 +107,7 @@ public class StudyController {
         return studyService.insertTip(email, requestDto);
     }
 
-    @PostMapping("/read")
+    @PostMapping("/tip/read")
     public StudyTipReadResponse readTip(
             HttpServletRequest request,
             @RequestBody StudyTipReadRequest requestDto
