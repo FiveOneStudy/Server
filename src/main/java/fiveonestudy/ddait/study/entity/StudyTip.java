@@ -2,8 +2,7 @@ package fiveonestudy.ddait.study.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -24,7 +23,7 @@ public class StudyTip {
     @Column(length = 1000)
     private String title;
 
-    private String createdDate;
+    private LocalDate createdDate;
 
     @Column(columnDefinition = "TEXT")
     private String content;

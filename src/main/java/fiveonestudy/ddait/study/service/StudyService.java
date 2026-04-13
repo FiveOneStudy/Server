@@ -132,9 +132,10 @@ public class StudyService {
     public StudyTipResponse insertTip(String email, StudyTipInsertRequest request) {
 
         StudyTip tip = StudyTip.builder()
-                .writer(request.getWriter())
+                .studyName(request.getStudyName())
                 .title(request.getTitle())
-                .createdDate(LocalDate.now().toString())
+                .writer(request.getWriter())
+                .createdDate(LocalDate.now())
                 .content(request.getContent())
                 .url(request.getUrl())
                 .build();

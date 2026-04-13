@@ -2,7 +2,6 @@ package fiveonestudy.ddait.study.dto;
 
 import lombok.*;
 
-import java.util.List;
 
 @Getter
 @Setter

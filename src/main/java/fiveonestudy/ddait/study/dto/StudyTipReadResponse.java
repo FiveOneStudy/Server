@@ -1,8 +1,8 @@
 package fiveonestudy.ddait.study.dto;
 
 import lombok.*;
+import java.time.LocalDate;
 
-import java.util.List;
 
 @Getter
 @Setter
@@ -13,8 +13,7 @@ public class StudyTipReadResponse {
 
     private String title;
     private String writer;
-    private String date;
+    private LocalDate date;
     private String content;
-
     private String url;
 }
