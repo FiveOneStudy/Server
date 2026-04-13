@@ -3,6 +3,8 @@ package fiveonestudy.ddait.study.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -26,6 +28,12 @@ public class StudyTip {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    // 🔥 추가
-    private String bookUrl;
+    // 🔥 여러 개 URL 저장
+    @ElementCollection
+    @CollectionTable(
+            name = "study_tip_url",
+            joinColumns = @JoinColumn(name = "study_tip_id")
+    )
+    @Column(name = "url")
+    private List<String> url;
 }

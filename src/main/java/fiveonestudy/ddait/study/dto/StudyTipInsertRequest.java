@@ -2,6 +2,8 @@ package fiveonestudy.ddait.study.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +15,6 @@ public class StudyTipInsertRequest {
     private String writer;
     private String content;
 
-    // 🔥 추가
-    private String bookUrl;
+    // 🔥 여러 개 URL
+    private List<String> url;
 }
