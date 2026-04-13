@@ -132,12 +132,11 @@ public class StudyService {
     public StudyTipResponse insertTip(String email, StudyTipInsertRequest request) {
 
         StudyTip tip = StudyTip.builder()
-                .studyName(request.getStudyName())
                 .writer(request.getWriter())
                 .title(request.getTitle())
                 .createdDate(LocalDate.now().toString())
                 .content(request.getContent())
-                .url(request.getUrl()) // 🔥 리스트 저장
+                .url(request.getUrl())
                 .build();
 
         studyTipRepository.save(tip);
@@ -157,7 +156,7 @@ public class StudyService {
                 .writer(tip.getWriter())
                 .date(tip.getCreatedDate())
                 .content(tip.getContent())
-                .url(tip.getUrl()) // 🔥 리스트 그대로 반환
+                .url(tip.getUrl())
                 .build();
     }
 }

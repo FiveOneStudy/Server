@@ -16,6 +16,5 @@ public class StudyTipReadResponse {
     private String date;
     private String content;
 
-    // 🔥 리스트로 변경
-    private List<String> url;
+    private String url;
 }

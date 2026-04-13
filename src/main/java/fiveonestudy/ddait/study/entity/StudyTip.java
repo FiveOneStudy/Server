@@ -21,6 +21,7 @@ public class StudyTip {
 
     private String writer;
 
+    @Column(length = 1000)
     private String title;
 
     private String createdDate;
@@ -28,12 +29,6 @@ public class StudyTip {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    // 🔥 여러 개 URL 저장
-    @ElementCollection
-    @CollectionTable(
-            name = "study_tip_url",
-            joinColumns = @JoinColumn(name = "study_tip_id")
-    )
-    @Column(name = "url")
-    private List<String> url;
+    @Column(length = 1000)
+    private String url;
 }

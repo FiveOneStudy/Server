@@ -14,7 +14,5 @@ public class StudyTipInsertRequest {
     private String title;
     private String writer;
     private String content;
-
-    // 🔥 여러 개 URL
-    private List<String> url;
+    private String url;
 }
