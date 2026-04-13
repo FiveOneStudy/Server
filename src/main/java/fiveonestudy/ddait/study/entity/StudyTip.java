@@ -25,7 +25,7 @@ public class StudyTip {
 
     private LocalDate createdDate;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 1000)
     private String content;
 
     @Column(length = 1000)

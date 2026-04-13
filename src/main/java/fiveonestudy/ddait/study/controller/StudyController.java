@@ -93,6 +93,7 @@ public class StudyController {
             HttpServletRequest request,
             @RequestBody StudyTipInsertRequest requestDto
     ) {
+        System.out.println(">>> 컨트롤러 진입 성공!");
 
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
