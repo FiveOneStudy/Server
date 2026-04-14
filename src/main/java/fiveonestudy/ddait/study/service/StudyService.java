@@ -169,12 +169,10 @@ public class StudyService {
     }
 
     private UserProgress getOrCreateUserProgress(StudyProgress study, String nickname) {
-
         return study.getUserProgressList().stream()
                 .filter(u -> u.getNickname().equals(nickname))
                 .findFirst()
                 .orElseGet(() -> {
-
                     UserProgress newUser = UserProgress.builder()
                             .nickname(nickname)
                             .studyProgress(study)
@@ -191,7 +189,11 @@ public class StudyService {
 
                     newUser.setUserMissions(userMissions);
 
-                    return userProgressRepository.save(newUser);
+                    // 핵심: DB에 저장함과 동시에 메모리(study 객체)의 리스트에도 추가
+                    UserProgress savedUser = userProgressRepository.save(newUser);
+                    study.getUserProgressList().add(savedUser);
+
+                    return savedUser;
                 });
     }
 
