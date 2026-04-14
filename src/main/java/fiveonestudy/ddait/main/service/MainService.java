@@ -1,5 +1,6 @@
 package fiveonestudy.ddait.main.service;
 
+import fiveonestudy.ddait.main.dto.CheckCompleteRequest;
 import fiveonestudy.ddait.myPage.repository.UserCertificationRepository;
 import fiveonestudy.ddait.plan.dto.CheckItem;
 import fiveonestudy.ddait.plan.dto.MonthlyPlan;
@@ -31,6 +32,28 @@ public class MainService {
     private final StudyRepository studyRepository;
     private final UserStudyRepository userStudyRepository;
     private final UserCertificationRepository userCertificationRepository;
+
+    @Transactional
+    public MainResponse updateCheckAndGetMainData(String email, CheckCompleteRequest requestDto) {
+
+        // 1. 체크리스트 찾기 및 상태 업데이트 (False -> True)
+        CheckList check = checkListRepository
+                .findByEmailAndDateAndCheckContent(
+                        email,
+                        requestDto.getDate(),
+                        requestDto.getContent()
+                )
+                .orElseThrow(() -> new RuntimeException("해당 체크리스트를 찾을 수 없습니다."));
+
+        // 상태를 완료(true)로 변경
+        check.updateCompleted(true);
+
+        // 변경 사항 반영을 위해 명시적으로 save 호출 (더티 체킹을 사용해도 무방)
+        checkListRepository.save(check);
+
+        // 2. 업데이트 완료 후 기존 getMainData 메서드를 호출하여 동일한 포맷의 응답 생성
+        return getMainData(email, requestDto.getDate());
+    }
 
     public MainResponse getMainData(String email, LocalDate date) {
 
