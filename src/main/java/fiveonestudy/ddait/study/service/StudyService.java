@@ -175,24 +175,47 @@ public class StudyService {
         return new StudyTipListResponse(tipList);
     }
 
+    private UserProgress getOrCreateUserProgress(StudyProgress study, String nickname) {
+
+        return study.getUserProgressList().stream()
+                .filter(u -> u.getNickname().equals(nickname))
+                .findFirst()
+                .orElseGet(() -> {
+
+                    UserProgress newUser = UserProgress.builder()
+                            .nickname(nickname)
+                            .studyProgress(study)
+                            .build();
+
+                    List<UserMission> userMissions = study.getMissions().stream()
+                            .map(mission -> UserMission.builder()
+                                    .userProgress(newUser)
+                                    .studyMission(mission)
+                                    .completed(false)
+                                    .build()
+                            )
+                            .toList();
+
+                    newUser.setUserMissions(userMissions);
+
+                    study.getUserProgressList().add(newUser);
+
+                    return newUser;
+                });
+    }
+
     public StudyProgressResponse completeMission(String nickname, String studyName, String subject) {
 
         StudyProgress study = studyProgressRepository.findByStudyName(studyName)
                 .orElseThrow(() -> new RuntimeException("스터디 없음"));
 
-        // 🔹 유저 찾기
-        UserProgress me = study.getUserProgressList().stream()
-                .filter(u -> u.getNickname().equals(nickname))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
+        UserProgress me = getOrCreateUserProgress(study, nickname);
 
-        // 🔹 미션 찾기
         UserMission targetMission = me.getUserMissions().stream()
                 .filter(um -> um.getStudyMission().getMissionName().equals(subject))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("미션 없음"));
 
-        // 🔥 완료 처리
         targetMission.setCompleted(true);
 
         return buildResponse(study, me);
@@ -203,10 +226,7 @@ public class StudyService {
         StudyProgress study = studyProgressRepository.findByStudyName(studyName)
                 .orElseThrow(() -> new RuntimeException("스터디 없음"));
 
-        UserProgress me = study.getUserProgressList().stream()
-                .filter(u -> u.getNickname().equals(nickname))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
+        UserProgress me = getOrCreateUserProgress(study, nickname);
 
         return buildResponse(study, me);
     }
@@ -264,13 +284,8 @@ public class StudyService {
         StudyProgress study = studyProgressRepository.findByStudyName(studyName)
                 .orElseThrow(() -> new RuntimeException("스터디 없음"));
 
-        // 🔹 유저 찾기
-        UserProgress me = study.getUserProgressList().stream()
-                .filter(u -> u.getNickname().equals(nickname))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
+        UserProgress me = getOrCreateUserProgress(study, nickname);
 
-        // 🔥 핵심: 검색 필터링
         List<List<Object>> mission = me.getUserMissions().stream()
                 .filter(um -> um.getStudyMission().getMissionName().contains(keyword))
                 .map(um -> List.of(
