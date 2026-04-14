@@ -175,66 +175,6 @@ public class StudyService {
         return new StudyTipListResponse(tipList);
     }
 
-    public StudyProgressResponse getProgress(String nickname, String studyName) {
-
-        StudyProgress study = studyProgressRepository.findByStudyName(studyName)
-                .orElseThrow(() -> new RuntimeException("스터디 없음"));
-
-        List<UserProgress> users = study.getUserProgressList();
-
-        // 🔹 유저별 progress 계산
-        Map<UserProgress, Integer> progressMap = new HashMap<>();
-
-        for (UserProgress user : users) {
-            List<UserMission> missions = user.getUserMissions();
-
-            int total = missions.size();
-            long completed = missions.stream()
-                    .filter(UserMission::isCompleted)
-                    .count();
-
-            int progress = total == 0 ? 0 : (int)((double) completed / total * 100);
-
-            progressMap.put(user, progress);
-        }
-
-        // 🔹 전체 평균
-        int mainProgress = (int) progressMap.values().stream()
-                .mapToInt(Integer::intValue)
-                .average()
-                .orElse(0);
-
-        // 🔹 memberProgress
-        List<List<String>> memberProgress = users.stream()
-                .map(u -> List.of(
-                        u.getNickname(),
-                        String.valueOf(progressMap.get(u))
-                ))
-                .toList();
-
-        // 🔹 로그인 유저
-        UserProgress me = users.stream()
-                .filter(u -> u.getNickname().equals(nickname))
-                .findFirst()
-                .orElseThrow();
-
-        // 🔹 내 미션
-        List<List<Object>> mission = me.getUserMissions().stream()
-                .map(um -> List.of(
-                        (Object) um.getStudyMission().getMissionName(),
-                        (Object) um.isCompleted()
-                ))
-                .collect(Collectors.toList());
-
-        return StudyProgressResponse.builder()
-                .mainProgress(mainProgress)
-                .memberProgress(memberProgress)
-                .name(me.getNickname())
-                .progress(String.valueOf(progressMap.get(me)))
-                .mission(mission)
-                .build();
-    }
-
     public StudyProgressResponse completeMission(String nickname, String studyName, String subject) {
 
         StudyProgress study = studyProgressRepository.findByStudyName(studyName)
@@ -246,16 +186,34 @@ public class StudyService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("유저 없음"));
 
-        // 🔥 핵심: 미션 찾기
+        // 🔹 미션 찾기
         UserMission targetMission = me.getUserMissions().stream()
                 .filter(um -> um.getStudyMission().getMissionName().equals(subject))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("미션 없음"));
 
-        // 🔹 완료 처리
+        // 🔥 완료 처리
         targetMission.setCompleted(true);
 
-        // 🔹 전체 progress 재계산
+        return buildResponse(study, me);
+    }
+
+    public StudyProgressResponse getProgress(String nickname, String studyName) {
+
+        StudyProgress study = studyProgressRepository.findByStudyName(studyName)
+                .orElseThrow(() -> new RuntimeException("스터디 없음"));
+
+        UserProgress me = study.getUserProgressList().stream()
+                .filter(u -> u.getNickname().equals(nickname))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        return buildResponse(study, me);
+    }
+
+    // 🔥 공통 로직 분리 (중요)
+    private StudyProgressResponse buildResponse(StudyProgress study, UserProgress me) {
+
         List<UserProgress> users = study.getUserProgressList();
 
         Map<UserProgress, Integer> progressMap = new HashMap<>();
@@ -273,13 +231,11 @@ public class StudyService {
             progressMap.put(user, progress);
         }
 
-        // 🔹 전체 평균
         int mainProgress = (int) progressMap.values().stream()
                 .mapToInt(Integer::intValue)
                 .average()
                 .orElse(0);
 
-        // 🔹 memberProgress
         List<List<String>> memberProgress = users.stream()
                 .map(u -> List.of(
                         u.getNickname(),
@@ -287,7 +243,6 @@ public class StudyService {
                 ))
                 .toList();
 
-        // 🔹 내 미션
         List<List<Object>> mission = me.getUserMissions().stream()
                 .map(um -> List.of(
                         (Object) um.getStudyMission().getMissionName(),
