@@ -138,10 +138,12 @@ public class StudyService {
                 .build();
     }
 
-    public StudyTipReadResponse readTip(String email, StudyTipReadRequest request) {
+    public StudyTipReadResponse readTip(String nickname, StudyTipReadRequest request) {
 
         StudyTip tip = studyTipRepository.findById(request.getStudyId())
                 .orElseThrow(() -> new RuntimeException("해당 글이 없습니다."));
+
+        boolean isOwner = tip.getWriter().equals(nickname);
 
         return StudyTipReadResponse.builder()
                 .title(tip.getTitle())
@@ -149,6 +151,7 @@ public class StudyService {
                 .date(tip.getCreatedDate())
                 .content(tip.getContent())
                 .url(tip.getUrl())
+                .button(isOwner) // 일치하면 true, 불일치면 false
                 .build();
     }
 

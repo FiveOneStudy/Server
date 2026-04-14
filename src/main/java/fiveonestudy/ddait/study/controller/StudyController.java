@@ -112,6 +112,8 @@ public class StudyController {
         return studyService.insertTip(user.getNickname(), requestDto);
     }
 
+    // StudyController.java 내부
+
     @PostMapping("/tip/read")
     public StudyTipReadResponse readTip(
             HttpServletRequest request,
@@ -128,7 +130,10 @@ public class StudyController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
 
-        return studyService.readTip(email, requestDto);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        return studyService.readTip(user.getNickname(), requestDto);
     }
 
     @PostMapping("/tip")

@@ -16,4 +16,5 @@ public class StudyTipReadResponse {
     private LocalDate date;
     private String content;
     private String url;
+    private boolean button;
 }
