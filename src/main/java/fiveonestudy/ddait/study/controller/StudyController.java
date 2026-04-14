@@ -149,9 +149,44 @@ public class StudyController {
 
     @PostMapping("/progress")
     public StudyProgressResponse getProgress(
-            @RequestBody StudyNameRequest request,
+            HttpServletRequest request,
+            @RequestBody StudyNameRequest requestDto,
             @RequestParam String nickname
     ) {
-        return studyService.getProgress(nickname, request.getStudyName());
+        // 1. 토큰 추출
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
+
+        // 2. 토큰 검증
+        if (!jwtService.isTokenValid(accessToken)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+
+        // 3. 서비스 호출
+        return studyService.getProgress(nickname, requestDto.getStudyName());
+    }
+
+    @PostMapping("/progress/complete")
+    public StudyProgressResponse completeMission(
+            HttpServletRequest request,
+            @RequestParam String nickname,
+            @RequestParam String studyName,
+            @RequestBody MissionCompleteRequest requestDto
+    ) {
+        // 1. 토큰 추출
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
+
+        // 2. 토큰 검증
+        if (!jwtService.isTokenValid(accessToken)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+
+        // 3. 서비스 호출
+        return studyService.completeMission(
+                nickname,
+                studyName,
+                requestDto.getSubject()
+        );
     }
 }
