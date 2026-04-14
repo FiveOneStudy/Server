@@ -258,4 +258,29 @@ public class StudyService {
                 .mission(mission)
                 .build();
     }
+
+    public MissionSearchResponse searchMission(String nickname, String studyName, String keyword) {
+
+        StudyProgress study = studyProgressRepository.findByStudyName(studyName)
+                .orElseThrow(() -> new RuntimeException("스터디 없음"));
+
+        // 🔹 유저 찾기
+        UserProgress me = study.getUserProgressList().stream()
+                .filter(u -> u.getNickname().equals(nickname))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        // 🔥 핵심: 검색 필터링
+        List<List<Object>> mission = me.getUserMissions().stream()
+                .filter(um -> um.getStudyMission().getMissionName().contains(keyword))
+                .map(um -> List.of(
+                        (Object) um.getStudyMission().getMissionName(),
+                        (Object) um.isCompleted()
+                ))
+                .toList();
+
+        return MissionSearchResponse.builder()
+                .mission(mission)
+                .build();
+    }
 }
