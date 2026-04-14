@@ -29,7 +29,6 @@ public class StudyService {
 
     public StudyResponse getStudy(String userName) {
 
-        // studyName → date 매핑
         Map<String, String> studyDateMap = studyRepository.findAll()
                 .stream()
                 .collect(Collectors.toMap(
@@ -37,7 +36,6 @@ public class StudyService {
                         Study::getDate
                 ));
 
-        // 내가 가입한 스터디 + dday 계산
         List<StudyResponse.MyStudy> myStudies =
                 userStudyRepository.findByUserName(userName)
                         .stream()
@@ -52,7 +50,6 @@ public class StudyService {
                         })
                         .collect(Collectors.toList());
 
-        // 전체 스터디 목록
         List<String> allStudies = studyDateMap.keySet()
                 .stream()
                 .toList();
@@ -63,20 +60,16 @@ public class StudyService {
                 .build();
     }
 
-    // 🔥 숫자 D-day 반환
     private int calculateDday(String dateStr) {
         LocalDate today = LocalDate.now();
         LocalDate examDate = LocalDate.parse(dateStr); // "yyyy-MM-dd"
 
         return (int) ChronoUnit.DAYS.between(today, examDate);
-        // 미래: 양수 (남은 일수)
-        // 오늘: 0
-        // 과거: 음수
+
     }
 
     public StudyJoinResponse joinStudy(String userName, StudyNameRequest request) {
 
-        // 🔥 중복 가입 방지
         boolean exists = userStudyRepository
                 .findByUserNameAndStudyName(userName, request.getStudyName())
                 .isPresent();
@@ -231,7 +224,6 @@ public class StudyService {
         return buildResponse(study, me);
     }
 
-    // 🔥 공통 로직 분리 (중요)
     private StudyProgressResponse buildResponse(StudyProgress study, UserProgress me) {
 
         List<UserProgress> users = study.getUserProgressList();
