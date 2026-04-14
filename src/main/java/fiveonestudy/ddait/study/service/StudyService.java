@@ -290,4 +290,17 @@ public class StudyService {
                 .mission(mission)
                 .build();
     }
+
+    public StudyJoinResponse deleteTip(String email, StudyTipReadRequest request) {
+        // 해당 ID의 팁이 존재하는지 확인 후 삭제 (성능을 위해 deleteById 사용)
+        if (!studyTipRepository.existsById(request.getStudyId())) {
+            throw new RuntimeException("삭제할 해당 글이 없습니다.");
+        }
+
+        studyTipRepository.deleteById(request.getStudyId());
+
+        return StudyJoinResponse.builder()
+                .answer(true)
+                .build();
+    }
 }
