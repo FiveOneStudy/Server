@@ -226,7 +226,7 @@ public class StudyService {
 
         List<UserProgress> users = study.getUserProgressList();
 
-        Map<String, Integer> progressMap = new HashMap<>();
+        Map<UserProgress, Integer> progressMap = new HashMap<>();
 
         for (UserProgress user : users) {
             List<UserMission> missions = user.getUserMissions();
@@ -238,7 +238,7 @@ public class StudyService {
 
             int progress = total == 0 ? 0 : (int)((double) completed / total * 100);
 
-            progressMap.put(user.getNickname(), progress);
+            progressMap.put(user, progress);
         }
 
         int mainProgress = (int) progressMap.values().stream()
@@ -264,7 +264,7 @@ public class StudyService {
                 .mainProgress(mainProgress)
                 .memberProgress(memberProgress)
                 .name(me.getNickname())
-                .progress(String.valueOf(progressMap.get(me.getNickname())))
+                .progress(String.valueOf(progressMap.get(me)))
                 .mission(mission)
                 .build();
     }
