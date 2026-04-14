@@ -1,6 +1,7 @@
 package fiveonestudy.ddait.main.service;
 
 import fiveonestudy.ddait.main.dto.CheckCompleteRequest;
+import fiveonestudy.ddait.main.dto.SearchResponse;
 import fiveonestudy.ddait.myPage.repository.UserCertificationRepository;
 import fiveonestudy.ddait.plan.dto.CheckItem;
 import fiveonestudy.ddait.plan.dto.MonthlyPlan;
@@ -11,6 +12,7 @@ import fiveonestudy.ddait.plan.repository.PlanRepository;
 import fiveonestudy.ddait.study.dto.StudyResponse;
 import fiveonestudy.ddait.study.entity.Study;
 import fiveonestudy.ddait.study.repository.StudyRepository;
+import fiveonestudy.ddait.study.repository.StudyTipRepository;
 import fiveonestudy.ddait.study.repository.UserStudyRepository;
 import fiveonestudy.ddait.main.dto.MainResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +32,30 @@ public class MainService {
     private final PlanRepository planRepository;
     private final CheckListRepository checkListRepository;
     private final StudyRepository studyRepository;
+    private final StudyTipRepository studyTipRepository;
     private final UserStudyRepository userStudyRepository;
     private final UserCertificationRepository userCertificationRepository;
+
+    @Transactional(readOnly = true)
+    public SearchResponse searchStudy(String keyword) {
+
+        // 1. Study 이름 검색 (키워드 포함)
+        List<String> studies = studyRepository.findByNameContaining(keyword)
+                .stream()
+                .map(Study::getName)
+                .toList();
+
+        // 2. StudyTip 제목 검색 (키워드 포함)
+        List<List<Object>> tips = studyTipRepository.findByTitleContaining(keyword)
+                .stream()
+                .map(tip -> Arrays.asList((Object)tip.getId(), (Object)tip.getTitle()))
+                .toList();
+
+        return SearchResponse.builder()
+                .study(studies)
+                .tips(tips)
+                .build();
+    }
 
     @Transactional
     public MainResponse updateCheckAndGetMainData(String email, CheckCompleteRequest requestDto) {

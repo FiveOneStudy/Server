@@ -1,10 +1,9 @@
 package fiveonestudy.ddait.main.controller;
 
 import fiveonestudy.ddait.jwt.service.JwtService;
-import fiveonestudy.ddait.main.dto.CheckCompleteRequest;
-import fiveonestudy.ddait.main.dto.MainRequest;
-import fiveonestudy.ddait.main.dto.MainResponse;
+import fiveonestudy.ddait.main.dto.*;
 import fiveonestudy.ddait.main.service.MainService;
+import io.jsonwebtoken.lang.Collections;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -51,5 +50,19 @@ public class MainController {
 
         // 체크 상태 변경 후, 변경된 데이터를 포함한 전체 메인 데이터 반환
         return mainService.updateCheckAndGetMainData(email, requestDto);
+    }
+
+    @PostMapping("/main/search")
+    public SearchResponse searchMain(@RequestBody SearchRequest requestDto) {
+        // "study"인 경우에만 검색 수행 (community는 현재 개발 전이므로 빈 리스트 혹은 기본 처리)
+        if ("study".equals(requestDto.getSelect())) {
+            return mainService.searchStudy(requestDto.getSearch());
+        }
+
+        // study가 아닐 경우 빈 응답 반환
+        return SearchResponse.builder()
+                .study(Collections.emptyList())
+                .tips(Collections.emptyList())
+                .build();
     }
 }
