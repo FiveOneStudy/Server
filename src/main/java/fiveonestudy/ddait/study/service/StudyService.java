@@ -120,12 +120,12 @@ public class StudyService {
                 .build();
     }
 
-    public StudyTipResponse insertTip(String email, StudyTipInsertRequest request) {
+    public StudyTipResponse insertTip(String nickname, StudyTipInsertRequest request) {
 
         StudyTip tip = StudyTip.builder()
                 .studyName(request.getStudyName())
                 .title(request.getTitle())
-                .writer(request.getWriter())
+                .writer(nickname)
                 .createdDate(LocalDate.now())
                 .content(request.getContent())
                 .url(request.getUrl())

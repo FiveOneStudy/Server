@@ -96,7 +96,6 @@ public class StudyController {
             HttpServletRequest request,
             @RequestBody StudyTipInsertRequest requestDto
     ) {
-
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
 
@@ -107,7 +106,10 @@ public class StudyController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
 
-        return studyService.insertTip(email, requestDto);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        return studyService.insertTip(user.getNickname(), requestDto);
     }
 
     @PostMapping("/tip/read")
