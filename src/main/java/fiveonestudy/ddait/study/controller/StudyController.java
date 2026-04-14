@@ -162,8 +162,6 @@ public class StudyController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
 
-        System.out.println("token email: [" + email + "]");
-
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("유저 없음"));
 

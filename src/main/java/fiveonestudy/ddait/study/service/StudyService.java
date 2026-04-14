@@ -25,7 +25,7 @@ public class StudyService {
     private final StudyRequestRepository studyRequestRepository;
     private final StudyTipRepository studyTipRepository;
     private final StudyProgressRepository studyProgressRepository;
-    private final UserMissionRepository userMissionRepository;
+    private final UserProgressRepository userProgressRepository;
 
     public StudyResponse getStudy(String userName) {
 
@@ -191,9 +191,7 @@ public class StudyService {
 
                     newUser.setUserMissions(userMissions);
 
-                    study.getUserProgressList().add(newUser);
-
-                    return newUser;
+                    return userProgressRepository.save(newUser);
                 });
     }
 
