@@ -3,9 +3,10 @@ package fiveonestudy.ddait.study.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,8 +18,9 @@ public class StudyProgress {
 
     private String studyName;
 
-    private int totalProgress;
+    @OneToMany(mappedBy = "studyProgress", cascade = CascadeType.ALL)
+    private List<StudyMission> missions;
 
-    @Column(columnDefinition = "TEXT")
-    private String missionList; // JSON 형태로 저장 추천
+    @OneToMany(mappedBy = "studyProgress", cascade = CascadeType.ALL)
+    private List<UserProgress> userProgressList;
 }

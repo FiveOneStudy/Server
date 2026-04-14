@@ -146,4 +146,12 @@ public class StudyController {
         // 3. 서비스 호출 (email과 requestDto를 모두 전달)
         return studyService.getTips(email, requestDto);
     }
+
+    @PostMapping("/progress")
+    public StudyProgressResponse getProgress(
+            @RequestBody StudyNameRequest request,
+            @RequestParam String nickname
+    ) {
+        return studyService.getProgress(nickname, request.getStudyName());
+    }
 }

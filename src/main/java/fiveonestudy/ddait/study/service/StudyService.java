@@ -1,14 +1,8 @@
 package fiveonestudy.ddait.study.service;
 
 import fiveonestudy.ddait.study.dto.*;
-import fiveonestudy.ddait.study.entity.Study;
-import fiveonestudy.ddait.study.entity.StudyRequest;
-import fiveonestudy.ddait.study.entity.StudyTip;
-import fiveonestudy.ddait.study.entity.UserStudy;
-import fiveonestudy.ddait.study.repository.StudyRepository;
-import fiveonestudy.ddait.study.repository.StudyRequestRepository;
-import fiveonestudy.ddait.study.repository.StudyTipRepository;
-import fiveonestudy.ddait.study.repository.UserStudyRepository;
+import fiveonestudy.ddait.study.entity.*;
+import fiveonestudy.ddait.study.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
     import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +24,7 @@ public class StudyService {
     private final UserStudyRepository userStudyRepository;
     private final StudyRequestRepository studyRequestRepository;
     private final StudyTipRepository studyTipRepository;
+    private final StudyProgressRepository studyProgressRepository;
 
     public StudyResponse getStudy(String userName) {
 
@@ -176,5 +172,65 @@ public class StudyService {
                 .collect(Collectors.toList());
 
         return new StudyTipListResponse(tipList);
+    }
+
+    public StudyProgressResponse getProgress(String nickname, String studyName) {
+
+        StudyProgress study = studyProgressRepository.findByStudyName(studyName)
+                .orElseThrow(() -> new RuntimeException("스터디 없음"));
+
+        List<UserProgress> users = study.getUserProgressList();
+
+        // 🔹 유저별 progress 계산
+        Map<UserProgress, Integer> progressMap = new HashMap<>();
+
+        for (UserProgress user : users) {
+            List<UserMission> missions = user.getUserMissions();
+
+            int total = missions.size();
+            long completed = missions.stream()
+                    .filter(UserMission::isCompleted)
+                    .count();
+
+            int progress = total == 0 ? 0 : (int)((double) completed / total * 100);
+
+            progressMap.put(user, progress);
+        }
+
+        // 🔹 전체 평균
+        int mainProgress = (int) progressMap.values().stream()
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0);
+
+        // 🔹 memberProgress
+        List<List<String>> memberProgress = users.stream()
+                .map(u -> List.of(
+                        u.getNickname(),
+                        String.valueOf(progressMap.get(u))
+                ))
+                .toList();
+
+        // 🔹 로그인 유저
+        UserProgress me = users.stream()
+                .filter(u -> u.getNickname().equals(nickname))
+                .findFirst()
+                .orElseThrow();
+
+        // 🔹 내 미션
+        List<List<Object>> mission = me.getUserMissions().stream()
+                .map(um -> List.of(
+                        (Object) um.getStudyMission().getMissionName(),
+                        (Object) um.isCompleted()
+                ))
+                .collect(Collectors.toList());
+
+        return StudyProgressResponse.builder()
+                .mainProgress(mainProgress)
+                .memberProgress(memberProgress)
+                .name(me.getNickname())
+                .progress(String.valueOf(progressMap.get(me)))
+                .mission(mission)
+                .build();
     }
 }
