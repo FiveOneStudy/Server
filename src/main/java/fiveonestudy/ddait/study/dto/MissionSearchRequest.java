@@ -7,5 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MissionSearchRequest {
+    private String studyName;
     private String search;
 }

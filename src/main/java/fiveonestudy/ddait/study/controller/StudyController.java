@@ -155,24 +155,19 @@ public class StudyController {
             HttpServletRequest request,
             @RequestBody StudyNameRequest requestDto
     ) {
-        // 1. 토큰 추출
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
 
-        // 2. 토큰 검증
         if (!jwtService.isTokenValid(accessToken)) {
             throw new RuntimeException("유효하지 않은 토큰입니다.");
         }
 
-        // 3. email 추출
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
 
-        // 4. DB 조회로 nickname 가져오기
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("유저 없음"));
 
-        // 5. 서비스 호출
         return studyService.getProgress(
                 user.getNickname(),
                 requestDto.getStudyName()
@@ -183,7 +178,6 @@ public class StudyController {
     @PostMapping("/progress/complete")
     public StudyProgressResponse completeMission(
             HttpServletRequest request,
-            @RequestParam String studyName,
             @RequestBody MissionCompleteRequest requestDto
     ) {
         // 1. 토큰 추출
@@ -206,7 +200,7 @@ public class StudyController {
         // 5. 서비스 호출
         return studyService.completeMission(
                 user.getNickname(),
-                studyName,
+                requestDto.getStudyName(),
                 requestDto.getSubject()
         );
     }
@@ -214,7 +208,6 @@ public class StudyController {
     @PostMapping("/progress/search")
     public MissionSearchResponse searchMission(
             HttpServletRequest request,
-            @RequestParam String studyName,
             @RequestBody MissionSearchRequest requestDto
     ) {
         // 1. 토큰 추출
@@ -237,7 +230,7 @@ public class StudyController {
         // 5. 서비스 호출
         return studyService.searchMission(
                 user.getNickname(),
-                studyName,
+                requestDto.getStudyName(),
                 requestDto.getSearch()
         );
     }

@@ -7,5 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MissionCompleteRequest {
+    private String studyName;
     private String subject;
 }
