@@ -21,7 +21,7 @@ public class MyPostService {
         return postRepository.findByUserIdOrderByIdDesc(userId);
     }
 
-    public List<Comment> getMyComment(Long userId) {
+    public List<Comment> getMyComments(Long userId) {
         return commentRepository.findByUserId(userId);
     }
 }

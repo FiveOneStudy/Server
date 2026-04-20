@@ -4,13 +4,14 @@ import fiveonestudy.ddait.community.entity.Post;
 import fiveonestudy.ddait.community.entity.PostLike;
 import fiveonestudy.ddait.community.repository.PostLikeRepository;
 import fiveonestudy.ddait.community.repository.PostRepository;
+import fiveonestudy.ddait.global.exception.ForbiddenException;
+import fiveonestudy.ddait.global.exception.NotFoundException;
 import fiveonestudy.ddait.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,15 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
 
     public Long create(User user, String title, String content) {
+
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("INVALID_REQUEST");
+        }
+
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("INVALID_REQUEST");
+        }
+
         Post post = Post.builder()
                 .user(user)
                 .title(title)
@@ -27,49 +37,66 @@ public class PostService {
                 .likeCount(0)
                 .viewCount(0)
                 .build();
+
         postRepository.save(post);
         return post.getId();
     }
 
     @Transactional(readOnly = true)
     public List<Post> getPosts(String sort) {
-        if("popular".equals(sort)) {
-            return postRepository.findAllByOrderByLikeCountDesc();
-        }
-        return postRepository.findAllByOrderByIdDesc();
+
+        return switch (sort) {
+            case "popular" -> postRepository.findAllByOrderByLikeCountDesc();
+            case "latest" -> postRepository.findAllByOrderByIdDesc();
+            default -> throw new IllegalArgumentException("INVALID_SORT");
+        };
     }
 
     public Post getPost(Long id) {
+
         Post post = postRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("게시글 없음"));
+                .orElseThrow(() -> new NotFoundException("게시글 없음"));
+
         post.incrementView();
         return post;
     }
 
     public void delete(User user, Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시글 없음"));
 
-        if(!post.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("FORBIDDEN");
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("게시글 없음"));
+
+        if (!post.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException();
         }
+
         postRepository.delete(post);
     }
 
-    public boolean like(User user, Long id) {
+    public void like(User user, Long id) {
+
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시글 없음"));
+                .orElseThrow(() -> new NotFoundException("게시글 없음"));
 
-        Optional<PostLike> existing = postLikeRepository.findByUserAndPost(user, post);
+        boolean exists = postLikeRepository.existsByUserAndPost(user, post);
 
-        if(existing.isPresent()) {
-            postLikeRepository.delete(existing.get());
-            post.decrementLike();
-            return false;
+        if (exists) {
+            throw new IllegalArgumentException("ALREADY_LIKED");
         }
 
         postLikeRepository.save(new PostLike(user, post));
         post.incrementLike();
-        return true;
+    }
+
+    public void unlike(User user, Long id) {
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("게시글 없음"));
+
+        PostLike like = postLikeRepository.findByUserAndPost(user, post)
+                .orElseThrow(() -> new NotFoundException("좋아요 없음"));
+
+        postLikeRepository.delete(like);
+        post.decrementLike();
     }
 }

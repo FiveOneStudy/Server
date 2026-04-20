@@ -4,6 +4,8 @@ import fiveonestudy.ddait.community.entity.Comment;
 import fiveonestudy.ddait.community.entity.Post;
 import fiveonestudy.ddait.community.repository.CommentRepository;
 import fiveonestudy.ddait.community.repository.PostRepository;
+import fiveonestudy.ddait.global.exception.ForbiddenException;
+import fiveonestudy.ddait.global.exception.NotFoundException;
 import fiveonestudy.ddait.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,18 +17,24 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class CommentService {
+
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
 
     public Long create(User user, Long postId, String content, Long parentId) {
+
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("INVALID_REQUEST");
+        }
+
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글 없음"));
+                .orElseThrow(() -> new NotFoundException("게시글 없음"));
 
         Comment parent = null;
 
         if (parentId != null) {
             parent = commentRepository.findById(parentId)
-                    .orElseThrow(() -> new RuntimeException("부모 댓글 없음"));
+                    .orElseThrow(() -> new NotFoundException("부모 댓글 없음"));
         }
 
         Comment comment = Comment.builder()
@@ -42,23 +50,23 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<Comment> getComments(Long postId) {
+
+        if (!postRepository.existsById(postId)) {
+            throw new NotFoundException("게시글 없음");
+        }
+
         return commentRepository.findByPostIdOrderByIdAsc(postId);
     }
 
     public void delete(User user, Long commentId) {
+
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("댓글 없음"));
+                .orElseThrow(() -> new NotFoundException("댓글 없음"));
 
         if (!comment.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("FORBIDDEN");
+            throw new ForbiddenException();
         }
 
         comment.softDelete();
     }
-
-    @Transactional(readOnly = true)
-    public List<Comment> getMyComments(Long userId) {
-        return commentRepository.findByUserId(userId);
-    }
-
 }
