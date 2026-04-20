@@ -7,7 +7,7 @@ import fiveonestudy.ddait.myPage.dto.CertificationRequest;
 import fiveonestudy.ddait.myPage.dto.CertificationResponse;
 import fiveonestudy.ddait.myPage.entity.CertificationFile;
 import fiveonestudy.ddait.myPage.repository.CertificationFileRepository;
-import fiveonestudy.ddait.myPage.security.CustomUserDetails;
+import fiveonestudy.ddait.security.CustomUserDetails;
 import fiveonestudy.ddait.myPage.service.UserCertificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;

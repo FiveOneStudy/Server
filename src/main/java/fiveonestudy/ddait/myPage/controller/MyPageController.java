@@ -4,13 +4,11 @@ import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.myPage.dto.MyPageResponse;
 import fiveonestudy.ddait.myPage.dto.NicknameResponse;
 import fiveonestudy.ddait.myPage.dto.ProfileImageResponse;
-import fiveonestudy.ddait.myPage.security.CustomUserDetails;
+import fiveonestudy.ddait.security.CustomUserDetails;
 import fiveonestudy.ddait.myPage.service.MyPageService;
 import fiveonestudy.ddait.user.entity.User;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal; // ← 수정됨

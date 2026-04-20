@@ -5,7 +5,7 @@ import fiveonestudy.ddait.myPage.entity.CertificationVerification;
 import fiveonestudy.ddait.myPage.entity.UserCertification;
 import fiveonestudy.ddait.myPage.repository.CertificationVerificationRepository;
 import fiveonestudy.ddait.myPage.repository.UserCertificationRepository;
-import fiveonestudy.ddait.myPage.security.CustomUserDetails;
+import fiveonestudy.ddait.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
