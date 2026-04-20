@@ -40,4 +40,8 @@ public class Comment {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public void softDelete(){
+        this.content = "삭제된 댓글입니다.";
+    }
 }

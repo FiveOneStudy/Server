@@ -2,7 +2,6 @@ package fiveonestudy.ddait.community.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -36,4 +35,14 @@ public class Post {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public void incrementView() {
+        this.viewCount++;
+    }
+    public void incrementLike() {
+        this.likeCount++;
+    }
+    public void decrementLike() {
+        this.likeCount--;
+    }
 }
