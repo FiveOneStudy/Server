@@ -1,7 +1,7 @@
 package fiveonestudy.ddait.community.service;
 
-import fiveonestudy.ddait.community.entity.Comment;
-import fiveonestudy.ddait.community.entity.Post;
+import fiveonestudy.ddait.community.dto.MyCommentResponse;
+import fiveonestudy.ddait.community.dto.MyPostResponse;
 import fiveonestudy.ddait.community.repository.CommentRepository;
 import fiveonestudy.ddait.community.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,17 @@ public class MyPostService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
-    public List<Post> getMyPosts(Long userId) {
-        return postRepository.findByUserIdOrderByIdDesc(userId);
+    public List<MyPostResponse> getMyPosts(Long userId) {
+        return postRepository.findByUserIdOrderByIdDesc(userId)
+                .stream()
+                .map(MyPostResponse::from)
+                .toList();
     }
 
-    public List<Comment> getMyComments(Long userId) {
-        return commentRepository.findByUserId(userId);
+    public List<MyCommentResponse> getMyComments(Long userId) {
+        return commentRepository.findByUserIdOrderByIdDesc(userId)
+                .stream()
+                .map(MyCommentResponse::from)
+                .toList();
     }
 }
