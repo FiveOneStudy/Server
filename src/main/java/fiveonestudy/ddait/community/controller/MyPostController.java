@@ -3,7 +3,6 @@ package fiveonestudy.ddait.community.controller;
 import fiveonestudy.ddait.community.dto.MyCommentResponse;
 import fiveonestudy.ddait.community.dto.MyPostResponse;
 import fiveonestudy.ddait.community.service.MyPostService;
-import fiveonestudy.ddait.global.exception.UnauthorizedException;
 import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -26,16 +25,7 @@ public class MyPostController {
     public ResponseEntity<ApiResponse<List<MyPostResponse>>> getMyPosts(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-
-        if (userDetails == null) {
-            throw new UnauthorizedException();
-        }
-
-        List<MyPostResponse> result =
-                myPostService.getMyPosts(userDetails.getId())
-                        .stream()
-                        .map(MyPostResponse::from)
-                        .toList();
+        List<MyPostResponse> result = myPostService.getMyPosts(userDetails.getUser().getId());
 
         return ResponseEntity.ok(ApiResponse.success(result));
     }
@@ -44,16 +34,7 @@ public class MyPostController {
     public ResponseEntity<ApiResponse<List<MyCommentResponse>>> getMyComments(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-
-        if (userDetails == null) {
-            throw new UnauthorizedException();
-        }
-
-        List<MyCommentResponse> result =
-                myPostService.getMyComments(userDetails.getId())
-                        .stream()
-                        .map(MyCommentResponse::from)
-                        .toList();
+        List<MyCommentResponse> result = myPostService.getMyComments(userDetails.getUser().getId());
 
         return ResponseEntity.ok(ApiResponse.success(result));
     }

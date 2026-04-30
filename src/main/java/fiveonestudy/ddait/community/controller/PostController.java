@@ -1,11 +1,13 @@
 package fiveonestudy.ddait.community.controller;
 
+import fiveonestudy.ddait.community.dto.CreatePostRequest;
 import fiveonestudy.ddait.community.dto.PostResponse;
-import fiveonestudy.ddait.community.entity.Post;
+import fiveonestudy.ddait.community.entity.PostSort;
 import fiveonestudy.ddait.community.service.PostService;
 import fiveonestudy.ddait.global.exception.UnauthorizedException;
 import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,22 +25,21 @@ public class PostController {
     @PostMapping
     public ResponseEntity<ApiResponse<Map<String, Long>>> createPost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody Map<String, String> body
+            @RequestBody @Valid CreatePostRequest request
     ) {
-        if (userDetails == null) {
-            throw new UnauthorizedException();
-        }
+
         Long id = postService.create(
                 userDetails.getUser(),
-                body.get("title"),
-                body.get("content")
+                request.title(),
+                request.content()
         );
+
         return ResponseEntity.ok(ApiResponse.success(Map.of("postId", id)));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<PostResponse>>> getPosts(
-            @RequestParam(defaultValue = "latest") String sort
+            @RequestParam(defaultValue = "LATEST") PostSort sort
     ) {
 
         List<PostResponse> result = postService.getPosts(sort)
