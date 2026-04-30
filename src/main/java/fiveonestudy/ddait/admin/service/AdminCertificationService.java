@@ -1,4 +1,4 @@
-package fiveonestudy.ddait.myPage.service;
+package fiveonestudy.ddait.admin.service;
 
 import fiveonestudy.ddait.myPage.entity.CertificationStatus;
 import fiveonestudy.ddait.myPage.entity.CertificationVerification;
