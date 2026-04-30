@@ -3,8 +3,6 @@ package fiveonestudy.ddait.admin.controller;
 import fiveonestudy.ddait.admin.dto.CommentAdminResponse;
 import fiveonestudy.ddait.admin.dto.PostAdminResponse;
 import fiveonestudy.ddait.admin.service.AdminService;
-import fiveonestudy.ddait.community.entity.Comment;
-import fiveonestudy.ddait.community.entity.Post;
 import fiveonestudy.ddait.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +12,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminPostController {
 
     private final AdminService adminService;
 
