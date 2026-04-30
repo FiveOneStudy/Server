@@ -5,27 +5,22 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
 import fiveonestudy.ddait.user.entity.User;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 @Builder
 @AllArgsConstructor
 @Table(name = "comment")
 public class Comment {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
@@ -35,24 +30,28 @@ public class Comment {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    @Builder.Default
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
 
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     private String content;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    private CommentStatus status;
 
-    @Column(nullable = false)
-    private boolean deleted = false;
-
-    public void softDelete(){
-        this.deleted = true;
-        this.content = "삭제된 댓글입니다.";
+    @Builder
+    public Comment(User user, Post post, String content, Comment parent) {
+        this.user = user;
+        this.post = post;
+        this.content = content;
+        this.parent = parent;
     }
 
-    public boolean isDeleted() {
-        return deleted;
+    public void setStatus(CommentStatus status) {
+        this.status = status;
     }
 }
