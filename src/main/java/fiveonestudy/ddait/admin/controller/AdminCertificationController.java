@@ -1,9 +1,9 @@
-package fiveonestudy.ddait.myPage.controller;
+package fiveonestudy.ddait.admin.controller;
 
+import fiveonestudy.ddait.admin.service.AdminCertificationService;
 import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.myPage.dto.CertificationResponse;
-import fiveonestudy.ddait.myPage.service.AdminCertificationService;
-import fiveonestudy.ddait.myPage.security.CustomUserDetails;
+import fiveonestudy.ddait.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

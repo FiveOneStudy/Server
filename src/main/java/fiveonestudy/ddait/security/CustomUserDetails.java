@@ -1,4 +1,4 @@
-package fiveonestudy.ddait.myPage.security;
+package fiveonestudy.ddait.security;
 
 import fiveonestudy.ddait.user.entity.User;
 import lombok.Getter;

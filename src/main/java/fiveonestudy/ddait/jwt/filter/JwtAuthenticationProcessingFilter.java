@@ -4,7 +4,7 @@ package fiveonestudy.ddait.jwt.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fiveonestudy.ddait.jwt.dto.TokenDto;
 import fiveonestudy.ddait.jwt.service.JwtService;
-import fiveonestudy.ddait.myPage.security.CustomUserDetails;
+import fiveonestudy.ddait.security.CustomUserDetails;
 import fiveonestudy.ddait.user.entity.User;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
