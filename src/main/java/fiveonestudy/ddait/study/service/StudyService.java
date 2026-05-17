@@ -155,7 +155,7 @@ public class StudyService {
                 .build();
     }
 
-    public StudyTipListResponse getTips(String email, StudyNameRequest requestDto) { // 파라미터 수정
+    public StudyTipListResponse getTips(StudyNameRequest requestDto) {
 
         List<StudyTip> tips = studyTipRepository.findByStudyName(requestDto.getStudyName());
 

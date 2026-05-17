@@ -151,7 +151,7 @@ public class StudyController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
 
-        return studyService.getTips(email, requestDto);
+        return studyService.getTips(requestDto);
     }
 
     @DeleteMapping("/tip/delete")
