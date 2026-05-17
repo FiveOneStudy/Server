@@ -41,7 +41,7 @@ public class StudyService {
                         .stream()
                         .map(us -> {
                             String date = studyDateMap.get(us.getStudyName());
-                            int dday = calculateDday(date);
+                            int dday = calculateDDay(date);
 
                             return new StudyResponse.MyStudy(
                                     us.getStudyName(),
@@ -60,7 +60,7 @@ public class StudyService {
                 .build();
     }
 
-    private int calculateDday(String dateStr) {
+    private int calculateDDay(String dateStr) {
         LocalDate today = LocalDate.now();
         LocalDate examDate = LocalDate.parse(dateStr); // "yyyy-MM-dd"
 
@@ -295,12 +295,10 @@ public class StudyService {
     }
 
     public StudyJoinResponse deleteTip(String email, StudyTipReadRequest request) {
-        // 해당 ID의 팁이 존재하는지 확인 후 삭제 (성능을 위해 deleteById 사용)
-        if (!studyTipRepository.existsById(request.getStudyId())) {
-            throw new RuntimeException("삭제할 해당 글이 없습니다.");
-        }
 
-        studyTipRepository.deleteById(request.getStudyId());
+        StudyTip tip = studyTipRepository.findById(request.getStudyId())
+                .orElseThrow(() -> new RuntimeException("삭제할 해당 글이 없습니다."));
+        studyTipRepository.delete(tip);
 
         return StudyJoinResponse.builder()
                 .answer(true)
