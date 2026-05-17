@@ -8,11 +8,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleNoHandler(NoHandlerFoundException e) {
+        return ResponseEntity.status(404)
+                .body(ApiResponse.fail("NOT_FOUND", "존재하지 않는 경로입니다."));
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<?>> handleIllegalArgument(IllegalArgumentException e) {
