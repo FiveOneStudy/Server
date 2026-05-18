@@ -128,7 +128,7 @@ public class StudyService {
                 .writer(nickname)
                 .createdDate(LocalDate.now())
                 .content(request.getContent())
-                .url(request.getUrl())
+                .urls(request.getUrls())  // url → urls 변경
                 .build();
 
         studyTipRepository.save(tip);
@@ -150,8 +150,8 @@ public class StudyService {
                 .writer(tip.getWriter())
                 .date(tip.getCreatedDate())
                 .content(tip.getContent())
-                .url(tip.getUrl())
-                .button(isOwner) // 일치하면 true, 불일치면 false
+                .urls(tip.getUrls())  // url → urls 변경
+                .button(isOwner)
                 .build();
     }
 
