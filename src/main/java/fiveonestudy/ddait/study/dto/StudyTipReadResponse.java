@@ -17,8 +17,7 @@ public class StudyTipReadResponse {
     private LocalDate date;
     private String content;
 
-    // String → List<String> 변경
     @Builder.Default
-    private List<String> urls = new ArrayList<>();
+    private List<String> url = new ArrayList<>();
     private boolean button;
 }

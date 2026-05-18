@@ -14,5 +14,5 @@ public class StudyTipInsertRequest {
     private String studyName;
     private String title;
     private String content;
-    private List<String> urls = new ArrayList<>();
+    private List<String> url = new ArrayList<>();
 }

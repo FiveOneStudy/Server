@@ -35,5 +35,5 @@ public class StudyTip {
     @CollectionTable(name = "study_tip_urls", joinColumns = @JoinColumn(name = "study_tip_id"))
     @Column(name = "url", length = 1000)
     @Builder.Default
-    private List<String> urls = new ArrayList<>();
+    private List<String> url = new ArrayList<>();
 }
