@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 
 public class NoXssValidator implements ConstraintValidator<NoXss, Object> {
 
@@ -16,12 +17,25 @@ public class NoXssValidator implements ConstraintValidator<NoXss, Object> {
         }
 
         return Arrays.stream(obj.getClass().getDeclaredFields())
-                .filter(f -> f.getType() == String.class)
                 .allMatch(f -> {
                     f.setAccessible(true);
                     try {
-                        String value = (String) f.get(obj);
-                        return isClean(value);
+                        Object value = f.get(obj);
+
+                        // String 타입 검사
+                        if (value instanceof String) {
+                            return isClean((String) value);
+                        }
+
+                        // List<String> 타입 검사 추가
+                        if (value instanceof List<?> list) {
+                            return list.stream()
+                                    .filter(item -> item instanceof String)
+                                    .map(item -> (String) item)
+                                    .allMatch(this::isClean);
+                        }
+
+                        return true;
                     } catch (IllegalAccessException e) {
                         return true;
                     }
