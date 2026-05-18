@@ -2,7 +2,8 @@ package fiveonestudy.ddait.study.dto;
 
 import lombok.*;
 import java.time.LocalDate;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,6 +16,8 @@ public class StudyTipReadResponse {
     private String writer;
     private LocalDate date;
     private String content;
-    private String url;
+
+    @Builder.Default
+    private List<String> url = new ArrayList<>();
     private boolean button;
 }

@@ -5,6 +5,7 @@ import fiveonestudy.ddait.study.dto.*;
 import fiveonestudy.ddait.study.service.StudyService;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import fiveonestudy.ddait.user.entity.User;
@@ -37,7 +38,7 @@ public class StudyController {
     @PostMapping("/in")
     public StudyJoinResponse joinStudy(
             HttpServletRequest request,
-            @RequestBody StudyNameRequest requestDto
+            @RequestBody @Valid StudyNameRequest requestDto
     ) {
 
         String accessToken = jwtService.extractAccessToken(request)
@@ -56,7 +57,7 @@ public class StudyController {
     @DeleteMapping("/out")
     public StudyJoinResponse leaveStudy(
             HttpServletRequest request,
-            @RequestBody StudyNameRequest requestDto
+            @RequestBody @Valid StudyNameRequest requestDto
     ) {
 
         String accessToken = jwtService.extractAccessToken(request)
@@ -75,7 +76,7 @@ public class StudyController {
     @PostMapping("/request")
     public StudyJoinResponse requestStudy(
             HttpServletRequest request,
-            @RequestBody StudyNameRequest requestDto
+            @RequestBody @Valid StudyNameRequest requestDto
     ) {
 
         String accessToken = jwtService.extractAccessToken(request)
@@ -94,7 +95,7 @@ public class StudyController {
     @PostMapping("/tip/insert")
     public StudyTipResponse insertTip(
             HttpServletRequest request,
-            @RequestBody StudyTipInsertRequest requestDto
+            @RequestBody @Valid StudyTipInsertRequest requestDto
     ) {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
@@ -139,7 +140,7 @@ public class StudyController {
     @PostMapping("/tip")
     public StudyTipListResponse getTips(
             HttpServletRequest request,
-            @RequestBody StudyNameRequest requestDto
+            @RequestBody @Valid StudyNameRequest requestDto
     ) {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
@@ -151,7 +152,7 @@ public class StudyController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("토큰에서 이메일을 추출할 수 없습니다."));
 
-        return studyService.getTips(email, requestDto);
+        return studyService.getTips(requestDto);
     }
 
     @DeleteMapping("/tip/delete")
@@ -175,7 +176,7 @@ public class StudyController {
     @PostMapping("/progress")
     public StudyProgressResponse getProgress(
             HttpServletRequest request,
-            @RequestBody StudyNameRequest requestDto
+            @RequestBody @Valid StudyNameRequest requestDto
     ) {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
@@ -199,7 +200,7 @@ public class StudyController {
     @PostMapping("/progress/complete")
     public StudyProgressResponse completeMission(
             HttpServletRequest request,
-            @RequestBody MissionCompleteRequest requestDto
+            @RequestBody @Valid MissionCompleteRequest requestDto
     ) {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
@@ -223,7 +224,7 @@ public class StudyController {
     @PostMapping("/progress/search")
     public MissionSearchResponse searchMission(
             HttpServletRequest request,
-            @RequestBody MissionSearchRequest requestDto
+            @RequestBody @Valid MissionSearchRequest requestDto
     ) {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));

@@ -3,6 +3,8 @@ package fiveonestudy.ddait.study.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,6 +30,9 @@ public class StudyTip {
     @Column(length = 1000)
     private String content;
 
-    @Column(length = 1000)
-    private String url;
+    @ElementCollection
+    @CollectionTable(name = "study_tip_urls", joinColumns = @JoinColumn(name = "study_tip_id"))
+    @Column(name = "url", length = 1000)
+    @Builder.Default
+    private List<String> url = new ArrayList<>();
 }
