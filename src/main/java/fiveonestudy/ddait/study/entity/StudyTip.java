@@ -30,7 +30,6 @@ public class StudyTip {
     @Column(length = 1000)
     private String content;
 
-    // String → List<String> 변경, 콤마로 구분해서 하나의 컬럼에 저장
     @ElementCollection
     @CollectionTable(name = "study_tip_urls", joinColumns = @JoinColumn(name = "study_tip_id"))
     @Column(name = "url", length = 1000)

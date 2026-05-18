@@ -192,7 +192,6 @@ public class StudyService {
 
                     newUser.setUserMissions(userMissions);
 
-                    // 핵심: DB에 저장함과 동시에 메모리(study 객체)의 리스트에도 추가
                     UserProgress savedUser = userProgressRepository.save(newUser);
                     study.getUserProgressList().add(savedUser);
 
