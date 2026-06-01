@@ -1,18 +1,15 @@
 name: Deploy to CloudType
-
 on:
   push:
     branches: [ master ]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Replace DB password
-        run: sed -i 's|rootpassword:.*|rootpassword: "${{ secrets.MAIN_DB_PW }}"|' cloudtype.yaml
-
+        run: |
+          sed -i "s|rootpassword:.*|rootpassword: \"${{ secrets.MAIN_DB_PW }}\"|" cloudtype.yaml
       - name: Deploy to CloudType
         uses: cloudtype-github-actions/deploy@v1
         with:
