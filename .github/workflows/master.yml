@@ -14,4 +14,4 @@ jobs:
         uses: cloudtype-github-actions/deploy@v1
         with:
           token: ${{ secrets.CLOUDTYPE_API_KEY }}
-          ghtoken: ${{ secrets.GITHUB_TOKEN }}
+          project: songj239587/server
