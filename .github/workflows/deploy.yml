@@ -1,0 +1,32 @@
+name: Deploy to CloudType
+on:
+  push:
+    branches: [ master ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fill env values
+        run: |
+          sed -i "s|rootpassword:.*|rootpassword: \"${{ secrets.MAIN_DB_PW }}\"|" cloudtype.yaml
+          sed -i "s|name: DB_URL$|name: DB_URL|;/name: DB_URL/{n;s|value:.*|value: \"${{ secrets.DB_URL }}\"|}" cloudtype.yaml
+          sed -i "s|name: DB_PASSWORD$|name: DB_PASSWORD|;/name: DB_PASSWORD/{n;s|value:.*|value: \"${{ secrets.DB_PASSWORD }}\"|}" cloudtype.yaml
+          sed -i "s|name: DB_USERNAME$|name: DB_USERNAME|;/name: DB_USERNAME/{n;s|value:.*|value: \"${{ secrets.DB_USERNAME }}\"|}" cloudtype.yaml
+          sed -i "s|name: CLIENT_ID$|name: CLIENT_ID|;/name: CLIENT_ID/{n;s|value:.*|value: \"${{ secrets.CLIENT_ID }}\"|}" cloudtype.yaml
+          sed -i "s|name: CLIENT_SECRET$|name: CLIENT_SECRET|;/name: CLIENT_SECRET/{n;s|value:.*|value: \"${{ secrets.CLIENT_SECRET }}\"|}" cloudtype.yaml
+          sed -i "s|name: SK$|name: SK|;/name: SK/{n;s|value:.*|value: \"${{ secrets.SK }}\"|}" cloudtype.yaml
+          sed -i "s|name: USER_EMAIL$|name: USER_EMAIL|;/name: USER_EMAIL/{n;s|value:.*|value: \"${{ secrets.USER_EMAIL }}\"|}" cloudtype.yaml
+          sed -i "s|name: APP_PW$|name: APP_PW|;/name: APP_PW/{n;s|value:.*|value: \"${{ secrets.APP_PW }}\"|}" cloudtype.yaml
+          sed -i "s|name: OPENAI_API_KEY$|name: OPENAI_API_KEY|;/name: OPENAI_API_KEY/{n;s|value:.*|value: \"${{ secrets.OPENAI_API_KEY }}\"|}" cloudtype.yaml
+          sed -i "s|name: REDIS_PW$|name: REDIS_PW|;/name: REDIS_PW/{n;s|value:.*|value: \"${{ secrets.REDIS_PW }}\"|}" cloudtype.yaml
+          sed -i "s|name: REDIS_HOST$|name: REDIS_HOST|;/name: REDIS_HOST/{n;s|value:.*|value: \"${{ secrets.REDIS_HOST }}\"|}" cloudtype.yaml
+          sed -i "s|name: REDIS_PORT$|name: REDIS_PORT|;/name: REDIS_PORT/{n;s|value:.*|value: \"${{ secrets.REDIS_PORT }}\"|}" cloudtype.yaml
+
+      - name: Deploy to CloudType
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_API_KEY }}
+          project: "@songj239587/project"
+          file: cloudtype.yaml
