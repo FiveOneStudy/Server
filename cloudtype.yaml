@@ -1,0 +1,53 @@
+name: server
+app: java@17
+options:
+  ports: 8080
+  env:
+    - name: DB_URL
+      value:
+    - name: DB_PASSWORD
+      value:
+    - name: DB_USERNAME
+      value:
+    - name: CLIENT_ID
+      value:
+    - name: CLIENT_SECRET
+      value:
+    - name: SK
+      value:
+    - name: USER_EMAIL
+      value:
+    - name: APP_PW
+      value:
+    - name: OPENAI_API_KEY
+      value:
+    - name: REDIS_PW
+      value:
+    - name: REDIS_HOST
+      value:
+    - name: REDIS_PORT
+      value:
+  buildenv: []
+resources:
+  spot: true
+  memory: 0.5
+context:
+  git:
+    url: https://github.com/FiveOneStudy/Server.git
+    branch: master
+  preset: java-springboot
+---
+name: ddait
+app: mariadb@11.2
+options:
+  rootpassword:
+resources:
+  spot: true
+  cpu: 0
+  memory: 0.5
+  disk: 1
+  replicas: 1
+context:
+  preset: mariadb
+  git: {}
+ 
