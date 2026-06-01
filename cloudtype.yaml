@@ -2,6 +2,31 @@ name: server
 app: java@17
 options:
   ports: 8080
+  env:
+    - name: DB_URL
+      value:
+    - name: DB_PASSWORD
+      value:
+    - name: DB_USERNAME
+      value:
+    - name: CLIENT_ID
+      value:
+    - name: CLIENT_SECRET
+      value:
+    - name: SK
+      value:
+    - name: USER_EMAIL
+      value:
+    - name: APP_PW
+      value:
+    - name: OPENAI_API_KEY
+      value:
+    - name: REDIS_PW
+      value:
+    - name: REDIS_HOST
+      value:
+    - name: REDIS_PORT
+      value:
   buildenv: []
 resources:
   spot: true
@@ -25,4 +50,3 @@ resources:
 context:
   preset: mariadb
   git: {}
- 
