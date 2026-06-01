@@ -15,4 +15,5 @@ jobs:
         with:
           token: ${{ secrets.CLOUDTYPE_API_KEY }}
           project: "@songj239587/server"
+          stage: server
           file: cloudtype.yaml
