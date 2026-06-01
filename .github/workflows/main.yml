@@ -1,0 +1,17 @@
+name: Deploy to CloudType
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to CloudType
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_API_KEY }}
+          ghtoken: ${{ secrets.GITHUB_TOKEN }}
