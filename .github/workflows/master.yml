@@ -14,6 +14,5 @@ jobs:
         uses: cloudtype-github-actions/deploy@v1
         with:
           token: ${{ secrets.CLOUDTYPE_API_KEY }}
-          project: "@songj239587/server"
-          stage: server
+          project: "@songj239587/project"
           file: cloudtype.yaml
