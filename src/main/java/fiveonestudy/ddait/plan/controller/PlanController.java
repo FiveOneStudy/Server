@@ -6,7 +6,7 @@ import fiveonestudy.ddait.plan.service.PlanService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-// 배포 test
+
 @RestController
 @RequestMapping("/plan")
 @RequiredArgsConstructor
