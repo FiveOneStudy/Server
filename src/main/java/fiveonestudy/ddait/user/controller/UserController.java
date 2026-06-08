@@ -1,6 +1,9 @@
 package fiveonestudy.ddait.user.controller;
 
+import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.jwt.dto.TokenDto;
+import fiveonestudy.ddait.user.dto.PasswordResetDto;
+import fiveonestudy.ddait.user.dto.PasswordResetResponse;
 import fiveonestudy.ddait.user.dto.UserSignUpDto;
 import fiveonestudy.ddait.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,5 +21,14 @@ public class UserController {
     public ResponseEntity<TokenDto> signUp(@RequestBody @Validated UserSignUpDto dto) {
 
         return ResponseEntity.ok(userService.signUp(dto));
+    }
+
+    @PatchMapping("/password/reset")
+    public ResponseEntity<ApiResponse<PasswordResetResponse>> resetPassword(
+            @RequestBody @Validated PasswordResetDto dto
+    ) {
+        userService.resetPassword(dto);
+
+        return ResponseEntity.ok().build();
     }
 }
