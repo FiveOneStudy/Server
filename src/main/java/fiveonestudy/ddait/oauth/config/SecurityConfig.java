@@ -70,6 +70,7 @@ public class SecurityConfig {
                                            AuthenticationManager authenticationManager, LoginService loginService, CustomJsonUsernamePasswordAuthenticationFilter customFilter, JwtAuthenticationProcessingFilter jwtFilter) throws Exception {
 
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 .csrf(csrf -> csrf.disable())
