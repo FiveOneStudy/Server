@@ -7,5 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class PasswordResetDto {
     private String email;
+    private String code;
     private String newPassword;
 }
