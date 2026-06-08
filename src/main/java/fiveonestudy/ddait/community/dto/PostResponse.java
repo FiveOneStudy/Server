@@ -4,6 +4,8 @@ import fiveonestudy.ddait.community.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @Getter
 @Builder
 public class PostResponse {
@@ -14,6 +16,7 @@ public class PostResponse {
     private int likeCount;
     private int viewCount;
     private String writer;
+    private LocalDate createdAt;
 
     public static PostResponse from(Post post) {
         return PostResponse.builder()
@@ -23,6 +26,7 @@ public class PostResponse {
                 .likeCount(post.getLikeCount())
                 .viewCount(post.getViewCount())
                 .writer(post.getUser().getNickname())
+                .createdAt(post.getCreatedAt().toLocalDate())
                 .build();
     }
 }

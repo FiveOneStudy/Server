@@ -6,7 +6,9 @@ import lombok.*;
 
 import jakarta.persistence.*;
 import fiveonestudy.ddait.user.entity.User;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +44,9 @@ public class Comment {
 
     @Enumerated(EnumType.STRING)
     private CommentStatus status;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Builder
     public Comment(User user, Post post, String content, Comment parent) {
