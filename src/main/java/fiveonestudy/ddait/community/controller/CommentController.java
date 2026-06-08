@@ -3,7 +3,6 @@ package fiveonestudy.ddait.community.controller;
 import fiveonestudy.ddait.community.dto.CommentResponse;
 import fiveonestudy.ddait.community.dto.CreateCommentRequest;
 import fiveonestudy.ddait.community.service.CommentService;
-import fiveonestudy.ddait.global.exception.UnauthorizedException;
 import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.security.CustomUserDetails;
 import jakarta.validation.Valid;
