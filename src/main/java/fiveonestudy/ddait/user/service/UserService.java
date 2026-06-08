@@ -2,6 +2,7 @@ package fiveonestudy.ddait.user.service;
 
 import fiveonestudy.ddait.jwt.dto.TokenDto;
 import fiveonestudy.ddait.jwt.service.JwtService;
+import fiveonestudy.ddait.user.dto.PasswordResetDto;
 import fiveonestudy.ddait.user.dto.UserSignUpDto;
 import fiveonestudy.ddait.user.entity.Role;
 import fiveonestudy.ddait.user.entity.User;
@@ -37,5 +38,12 @@ public class UserService {
         userRepository.save(user);
 
         return jwtService.issueToken(user.getEmail());
+    }
+
+    public void resetPassword(PasswordResetDto dto) {
+        User user = userRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+        user.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
     }
 }
