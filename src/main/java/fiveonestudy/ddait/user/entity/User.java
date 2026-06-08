@@ -42,6 +42,9 @@ public class User {
 
     private String refreshToken;
 
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
     public void updateRefreshToken(String updateRefreshToken) {
         this.refreshToken = updateRefreshToken;
     }
