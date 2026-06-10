@@ -39,22 +39,32 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<PostResponse>>> getPosts(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "LATEST") PostSort sort
     ) {
 
         List<PostResponse> result = postService.getPosts(sort)
                 .stream()
-                .map(PostResponse::from)
+                .map(post -> PostResponse.from(
+                        post,
+                        userDetails == null ? null : userDetails.getUser()
+                ))
                 .toList();
 
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
+    public ResponseEntity<ApiResponse<PostResponse>> getPost(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long postId
+    ) {
 
         return ResponseEntity.ok(
-                ApiResponse.success(PostResponse.from(postService.getPost(postId)))
+                ApiResponse.success(PostResponse.from(
+                        postService.getPost(postId),
+                        userDetails == null ? null : userDetails.getUser()
+                ))
         );
     }
 

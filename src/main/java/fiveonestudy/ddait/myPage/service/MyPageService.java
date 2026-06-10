@@ -66,6 +66,7 @@ public class MyPageService {
 
         return MyPageResponse.builder()
                 .nickname(user.getNickname())
+                .email(user.getEmail())
                 .profileImageUrl("/mypage/profile-image/" + userId)
                 .certifications(certs)
                 .build();
