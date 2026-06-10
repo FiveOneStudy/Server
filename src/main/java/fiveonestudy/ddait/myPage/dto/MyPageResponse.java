@@ -12,6 +12,7 @@ import java.util.List;
 public class MyPageResponse {
 
     private String nickname;
+    private String email;
     private String profileImageUrl;
     private List<CertificationResponse> certifications;
 }
