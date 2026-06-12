@@ -3,6 +3,7 @@ package fiveonestudy.ddait.myPage.service;
 import fiveonestudy.ddait.myPage.dto.CertificationRequest;
 import fiveonestudy.ddait.myPage.entity.Certification;
 import fiveonestudy.ddait.myPage.entity.CertificationFile;
+import fiveonestudy.ddait.myPage.entity.CertificationStatus;
 import fiveonestudy.ddait.myPage.entity.UserCertification;
 import fiveonestudy.ddait.myPage.repository.CertificationFileRepository;
 import fiveonestudy.ddait.myPage.repository.CertificationRepository;
@@ -59,13 +60,23 @@ public class UserCertificationService {
             throw new RuntimeException("INVALID_FILE_TYPE");
         }
 
-        if (userCertificationRepository.existsByUserIdAndCertificationName(user.getId(), request.getName())) {
+        List<CertificationStatus> duplicateCheckStatuses = List.of(
+                CertificationStatus.APPROVED,
+                CertificationStatus.PENDING
+        );
+
+        if (userCertificationRepository.existsActiveCertificationName(
+                user.getId(),
+                request.getName(),
+                duplicateCheckStatuses
+        )) {
             throw new IllegalArgumentException("CERTIFICATION_DUPLICATE");
         }
 
-        if (certificationFileRepository.existsByUserCertificationUserIdAndOriginalName(
+        if (certificationFileRepository.existsActiveOriginalName(
                 user.getId(),
-                file.getOriginalFilename()
+                file.getOriginalFilename(),
+                duplicateCheckStatuses
         )) {
             throw new IllegalArgumentException("CERTIFICATION_FILE_DUPLICATE");
         }
