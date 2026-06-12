@@ -12,6 +12,8 @@ public interface UserCertificationRepository extends JpaRepository<UserCertifica
     List<UserCertification> findByUserId(Long userId);
     List<UserCertification> findByStatusOrderById(CertificationStatus status);
 
+    boolean existsByUserIdAndCertificationName(Long userId, String certificationName);
+
     @Query("SELECT uc FROM UserCertification uc JOIN FETCH uc.certification WHERE uc.user.email = :email")
     List<UserCertification> findByUserEmailWithCertification(@Param("email") String email);
 }

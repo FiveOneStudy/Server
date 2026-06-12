@@ -6,6 +6,7 @@ import fiveonestudy.ddait.myPage.entity.CertificationFile;
 import fiveonestudy.ddait.myPage.entity.UserCertification;
 import fiveonestudy.ddait.myPage.repository.CertificationFileRepository;
 import fiveonestudy.ddait.myPage.repository.CertificationRepository;
+import fiveonestudy.ddait.myPage.repository.CertificationVerificationRepository;
 import fiveonestudy.ddait.myPage.repository.UserCertificationRepository;
 import fiveonestudy.ddait.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ public class UserCertificationService {
     private final UserCertificationRepository userCertificationRepository;
     private final CertificationRepository certificationRepository;
     private final CertificationFileRepository certificationFileRepository;
+    private final CertificationVerificationRepository certificationVerificationRepository;
+
 
     public Long register(User user, CertificationRequest request, MultipartFile file) throws Exception {
 
@@ -54,6 +57,17 @@ public class UserCertificationService {
                 (!contentType.equals("application/pdf") &&
                         !contentType.startsWith("image/"))) {
             throw new RuntimeException("INVALID_FILE_TYPE");
+        }
+
+        if (userCertificationRepository.existsByUserIdAndCertificationName(user.getId(), request.getName())) {
+            throw new IllegalArgumentException("CERTIFICATION_DUPLICATE");
+        }
+
+        if (certificationFileRepository.existsByUserCertificationUserIdAndOriginalName(
+                user.getId(),
+                file.getOriginalFilename()
+        )) {
+            throw new IllegalArgumentException("CERTIFICATION_FILE_DUPLICATE");
         }
 
         Certification certification = certificationRepository.findByName(request.getName())
@@ -89,14 +103,14 @@ public class UserCertificationService {
 
     public void delete(Long userId, Long certificationId) {
         UserCertification uc = userCertificationRepository.findById(certificationId)
-                .orElseThrow(()-> new RuntimeException("자격증 없음"));
+                .orElseThrow(() -> new RuntimeException("자격증 없음"));
 
         if (!uc.getUser().getId().equals(userId)) {
             throw new RuntimeException("FORBIDDEN");
         }
 
+        certificationVerificationRepository.deleteByUserCertification(uc);
         certificationFileRepository.deleteByUserCertification(uc);
-
         userCertificationRepository.delete(uc);
     }
 
