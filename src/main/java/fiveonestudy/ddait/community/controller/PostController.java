@@ -2,6 +2,7 @@ package fiveonestudy.ddait.community.controller;
 
 import fiveonestudy.ddait.community.dto.CreatePostRequest;
 import fiveonestudy.ddait.community.dto.PostResponse;
+import fiveonestudy.ddait.community.entity.Post;
 import fiveonestudy.ddait.community.entity.PostSort;
 import fiveonestudy.ddait.community.service.PostService;
 import fiveonestudy.ddait.global.exception.UnauthorizedException;
@@ -47,7 +48,8 @@ public class PostController {
                 .stream()
                 .map(post -> PostResponse.from(
                         post,
-                        userDetails == null ? null : userDetails.getUser()
+                        userDetails == null ? null : userDetails.getUser(),
+                        null
                 ))
                 .toList();
 
@@ -57,14 +59,22 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<ApiResponse<PostResponse>> getPost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long postId
+            @PathVariable Long postId,
+            @RequestParam(defaultValue = "LATEST") PostSort sort
     ) {
 
+        Post post = postService.getPost(postId);
+
+        Long nextPostId = postService.getNextPostId(postId, sort);
+
         return ResponseEntity.ok(
-                ApiResponse.success(PostResponse.from(
-                        postService.getPost(postId),
-                        userDetails == null ? null : userDetails.getUser()
-                ))
+                ApiResponse.success(
+                        PostResponse.from(
+                                post,
+                                userDetails == null ? null : userDetails.getUser(),
+                                nextPostId
+                        )
+                )
         );
     }
 
