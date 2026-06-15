@@ -21,12 +21,14 @@ public class PostResponse {
     private String writer;
     private LocalDate createdAt;
     private boolean canDelete;
+    private Long nextPostId;
 
     public static PostResponse from(Post post) {
-        return from(post, null);
+        return from(post, null, null);
     }
 
-    public static PostResponse from(Post post, User currentUser) {
+    public static PostResponse from(Post post, User currentUser, Long nextPostId) {
+
         boolean canDelete = currentUser != null
                 && (post.getUser().getId().equals(currentUser.getId())
                 || currentUser.getRole() == Role.ADMIN);
@@ -41,6 +43,7 @@ public class PostResponse {
                 .userId(post.getUser().getId())
                 .createdAt(post.getCreatedAt().toLocalDate())
                 .canDelete(canDelete)
+                .nextPostId(nextPostId)
                 .build();
     }
 }
