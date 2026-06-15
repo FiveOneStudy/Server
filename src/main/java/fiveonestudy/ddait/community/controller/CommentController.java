@@ -5,6 +5,7 @@ import fiveonestudy.ddait.community.dto.CreateCommentRequest;
 import fiveonestudy.ddait.community.service.CommentService;
 import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.security.CustomUserDetails;
+import fiveonestudy.ddait.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,12 +40,17 @@ public class CommentController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<CommentResponse>>> getComments(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long postId
     ) {
+
+        User currentUser =
+                userDetails != null ? userDetails.getUser() : null;
+
         List<CommentResponse> result =
                 commentService.getComments(postId)
                         .stream()
-                        .map(CommentResponse::from)
+                        .map(comment -> CommentResponse.from(comment, currentUser))
                         .toList();
 
         return ResponseEntity.ok(ApiResponse.success(result));

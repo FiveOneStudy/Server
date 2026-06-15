@@ -14,6 +14,7 @@ public class MyPostResponse {
     private String title;
     private int likeCount;
     private int viewCount;
+    private Long userId;
     private LocalDate createdAt;
     private String writer;
 
@@ -23,6 +24,7 @@ public class MyPostResponse {
                 .title(post.getTitle())
                 .likeCount(post.getLikeCount())
                 .viewCount(post.getViewCount())
+                .userId(post.getUser().getId())
                 .createdAt(post.getCreatedAt().toLocalDate())
                 .writer(post.getUser().getNickname())
                 .build();

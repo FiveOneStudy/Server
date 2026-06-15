@@ -114,4 +114,32 @@ public class PostService {
         return postRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("게시글 없음"));
     }
+
+    @Transactional(readOnly = true)
+    public Long getNextPostId(Long postId, PostSort sort) {
+        Post currentPost = getPostEntity(postId);
+        switch (sort){
+            case LATEST:
+                return postRepository
+                        .findFirstByStatusAndIdLessThanOrderByIdDesc(
+                                PostStatus.APPROVED,
+                                postId
+                        )
+                        .map(Post::getId)
+                        .orElse(null);
+            case POPULAR:
+                List<Post> posts = postRepository.findAllByStatusOrderByLikeCountDesc(PostStatus.APPROVED);
+                for (int i = 0; i < posts.size(); i++) {
+                    if (posts.get(i).getId().equals(currentPost.getId())) {
+
+                        return i + 1 < posts.size()
+                                ? posts.get(i + 1).getId()
+                                : null;
+                    }
+                }
+                return null;
+
+        }
+        return null;
+    }
 }
