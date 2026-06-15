@@ -17,7 +17,7 @@ public class PostResponse {
     private String content;
     private int likeCount;
     private int viewCount;
-    private String writerEmail;
+    private Long userId;
     private String writer;
     private LocalDate createdAt;
     private boolean canDelete;
@@ -38,7 +38,7 @@ public class PostResponse {
                 .likeCount(post.getLikeCount())
                 .viewCount(post.getViewCount())
                 .writer(post.getUser().getNickname())
-                .writerEmail(post.getUser().getEmail())
+                .userId(post.getUser().getId())
                 .createdAt(post.getCreatedAt().toLocalDate())
                 .canDelete(canDelete)
                 .build();
