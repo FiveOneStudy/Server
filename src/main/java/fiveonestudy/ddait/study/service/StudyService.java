@@ -211,7 +211,7 @@ public class StudyService {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("미션 없음"));
 
-        targetMission.setCompleted(true);
+        targetMission.setCompleted(!targetMission.isCompleted());
 
         return buildResponse(study, me);
     }

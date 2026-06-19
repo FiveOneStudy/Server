@@ -113,8 +113,6 @@ public class StudyController {
         return studyService.insertTip(user.getNickname(), requestDto);
     }
 
-    // StudyController.java 내부
-
     @PostMapping("/tip/read")
     public StudyTipReadResponse readTip(
             HttpServletRequest request,
