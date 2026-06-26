@@ -63,7 +63,10 @@ public class PostController {
             @RequestParam(defaultValue = "LATEST") PostSort sort
     ) {
 
-        Post post = postService.getPost(postId);
+        Post post = postService.getPost(
+                postId,
+                userDetails == null ? null : userDetails.getUser()
+        );
 
         Long nextPostId = postService.getNextPostId(postId, sort);
 
@@ -87,36 +90,6 @@ public class PostController {
             throw new UnauthorizedException();
         }
         postService.delete(userDetails.getUser(), postId);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-    @PostMapping("/{postId}/likes")
-    public ResponseEntity<ApiResponse<Void>> likePost(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long postId
-    ) {
-
-        if (userDetails == null) {
-            throw new UnauthorizedException();
-        }
-
-        postService.like(userDetails.getUser(), postId);
-
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-    @DeleteMapping("/{postId}/likes")
-    public ResponseEntity<ApiResponse<Void>> unlikePost(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long postId
-    ) {
-
-        if (userDetails == null) {
-            throw new UnauthorizedException();
-        }
-
-        postService.unlike(userDetails.getUser(), postId);
-
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
