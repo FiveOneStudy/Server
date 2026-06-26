@@ -257,23 +257,26 @@ public class StudyService {
                 .map(UserProgress::getNickname)
                 .toList();
 
-        Map<String, User> nicknameToUser = userRepository.findAll().stream()
+        Map<String, Long> nicknameToUserId = userRepository.findAll().stream()
                 .filter(u -> nicknames.contains(u.getNickname()))
                 .collect(Collectors.toMap(
                         User::getNickname,
-                        u -> u
+                        User::getId
                 ));
 
-        java.util.function.Function<String, String> toBase64 = nickname -> {
-            User u = nicknameToUser.get(nickname);
-            if (u == null || u.getProfileImage() == null) return "";
-            return java.util.Base64.getEncoder().encodeToString(u.getProfileImage());
+        java.util.function.Function<String, String> profileImageUrl = nickname -> {
+            Long userId = nicknameToUserId.get(nickname);
+
+            if (userId == null) {
+                return "";
+            }
+            return "/users/profile-image/" + userId;
         };
 
         List<List<String>> memberProgress = users.stream()
                 .map(u -> List.of(
                         u.getNickname(),
-                        toBase64.apply(u.getNickname()),  // base64 이미지
+                        profileImageUrl.apply(u.getNickname()),
                         String.valueOf(progressMap.get(u))
                 ))
                 .toList();
@@ -285,13 +288,13 @@ public class StudyService {
                 ))
                 .toList();
 
-        String myProfileImageBase64 = toBase64.apply(me.getNickname());
+        String myProfileImageUrl = profileImageUrl.apply(me.getNickname());
 
         return StudyProgressResponse.builder()
                 .mainProgress(mainProgress)
                 .memberProgress(memberProgress)
                 .name(me.getNickname())
-                .profileImage(myProfileImageBase64)
+                .profileImage(myProfileImageUrl)
                 .progress(String.valueOf(progressMap.get(me)))
                 .mission(mission)
                 .build();
