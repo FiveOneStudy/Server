@@ -8,11 +8,12 @@ import fiveonestudy.ddait.community.repository.PostLikeRepository;
 import fiveonestudy.ddait.community.repository.PostRepository;
 import fiveonestudy.ddait.global.exception.ForbiddenException;
 import fiveonestudy.ddait.global.exception.NotFoundException;
-import fiveonestudy.ddait.global.external.openai.ModerationClient;
 import fiveonestudy.ddait.global.moderation.dto.ModerationResult;
 import fiveonestudy.ddait.global.moderation.service.ModerationService;
 import fiveonestudy.ddait.user.entity.Role;
 import fiveonestudy.ddait.user.entity.User;
+import org.springframework.data.redis.core.RedisTemplate;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final PostLikeRepository postLikeRepository;
     private final ModerationService moderationService;
 
@@ -65,11 +67,30 @@ public class PostService {
         };
     }
 
-    public Post getPost(Long id) {
+    public Post getPost(Long id, User user) {
 
         Post post = getPostEntity(id);
 
-        post.incrementViewCount();
+        // 비로그인 처리 (선택 정책)
+        if (user == null) {
+            post.incrementViewCount();
+            return post;
+        }
+
+        String key = "view:" + user.getId() + ":" + id;
+
+        Boolean alreadyViewed = redisTemplate.hasKey(key);
+
+        if (Boolean.FALSE.equals(alreadyViewed)) {
+
+            post.incrementViewCount();
+
+            redisTemplate.opsForValue().set(
+                    key,
+                    "1",
+                    Duration.ofHours(24)
+            );
+        }
 
         return post;
     }
