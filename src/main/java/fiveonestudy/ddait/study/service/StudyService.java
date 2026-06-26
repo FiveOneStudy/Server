@@ -270,7 +270,7 @@ public class StudyService {
             if (userId == null) {
                 return "";
             }
-            return "/profile-image/" + userId;
+            return "/mypage/profile-image/" + userId;
         };
 
         List<List<String>> memberProgress = users.stream()
