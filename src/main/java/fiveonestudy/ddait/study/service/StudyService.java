@@ -257,8 +257,8 @@ public class StudyService {
                 .map(UserProgress::getNickname)
                 .toList();
 
-        Map<String, Long> nicknameToUserId = userRepository.findAll().stream()
-                .filter(u -> nicknames.contains(u.getNickname()))
+        Map<String, Long> nicknameToUserId = userRepository.findByNicknameIn(nicknames)
+                .stream()
                 .collect(Collectors.toMap(
                         User::getNickname,
                         User::getId
