@@ -3,9 +3,11 @@ package fiveonestudy.ddait.study.service;
 import fiveonestudy.ddait.study.dto.*;
 import fiveonestudy.ddait.study.entity.*;
 import fiveonestudy.ddait.study.repository.*;
+import fiveonestudy.ddait.user.repository.UserRepository;
+import fiveonestudy.ddait.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-    import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -26,6 +28,7 @@ public class StudyService {
     private final StudyTipRepository studyTipRepository;
     private final StudyProgressRepository studyProgressRepository;
     private final UserProgressRepository userProgressRepository;
+    private final UserRepository userRepository;
 
     public StudyResponse getStudy(String userName) {
 
@@ -250,9 +253,30 @@ public class StudyService {
                 .average()
                 .orElse(0);
 
+        List<String> nicknames = users.stream()
+                .map(UserProgress::getNickname)
+                .toList();
+
+        Map<String, Long> nicknameToUserId = userRepository.findByNicknameIn(nicknames)
+                .stream()
+                .collect(Collectors.toMap(
+                        User::getNickname,
+                        User::getId
+                ));
+
+        java.util.function.Function<String, String> profileImageUrl = nickname -> {
+            Long userId = nicknameToUserId.get(nickname);
+
+            if (userId == null) {
+                return "";
+            }
+            return "/mypage/profile-image/" + userId;
+        };
+
         List<List<String>> memberProgress = users.stream()
                 .map(u -> List.of(
                         u.getNickname(),
+                        profileImageUrl.apply(u.getNickname()),
                         String.valueOf(progressMap.get(u))
                 ))
                 .toList();
@@ -264,15 +288,17 @@ public class StudyService {
                 ))
                 .toList();
 
+        String myProfileImageUrl = profileImageUrl.apply(me.getNickname());
+
         return StudyProgressResponse.builder()
                 .mainProgress(mainProgress)
                 .memberProgress(memberProgress)
                 .name(me.getNickname())
+                .profileImage(myProfileImageUrl)
                 .progress(String.valueOf(progressMap.get(me)))
                 .mission(mission)
                 .build();
     }
-
     public MissionSearchResponse searchMission(String nickname, String studyName, String keyword) {
 
         StudyProgress study = studyProgressRepository.findByStudyName(studyName)

@@ -15,6 +15,7 @@ public class StudyProgressResponse {
     private List<List<String>> memberProgress;
 
     private String name;
+    private String profileImage;
     private String progress;
 
     private List<List<Object>> mission;
