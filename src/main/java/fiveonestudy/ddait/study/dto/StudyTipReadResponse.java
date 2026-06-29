@@ -14,6 +14,7 @@ public class StudyTipReadResponse {
 
     private String title;
     private String writer;
+    private String profileImage;
     private LocalDate date;
     private String content;
 
