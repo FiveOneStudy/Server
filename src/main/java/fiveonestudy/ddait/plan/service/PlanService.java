@@ -148,6 +148,9 @@ public class PlanService {
 
     public PlanResponse completeCheckList(String email, CheckListCompleteRequest requestDto) {
 
+        System.out.println("요청 checkId = " + requestDto.getCheckId());
+        System.out.println("요청 email = [" + email + "]");
+
         CheckList check = checkListRepository
                 .findByCheckIdAndEmail(requestDto.getCheckId(), email)
                 .orElseThrow(() -> new RuntimeException("해당 체크리스트가 없습니다."));
