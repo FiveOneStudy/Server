@@ -21,14 +21,21 @@ public class PlanService {
 
         List<Plan> dailyPlans = planRepository.findByEmailAndDate(email, date);
 
-        List<String> planList = dailyPlans.stream()
-                .map(Plan::getPlanContent)
+        List<PlanItem> planList = dailyPlans.stream()
+                .map(plan -> new PlanItem(
+                        plan.getPlanId(),
+                        plan.getPlanContent()
+                ))
                 .toList();
 
         List<CheckList> checks = checkListRepository.findByEmailAndDate(email, date);
 
         List<CheckItem> checkList = checks.stream()
-                .map(c -> new CheckItem(c.getCheckContent(), c.isCompleted()))
+                .map(c -> new CheckItem(
+                        c.getCheckId(),
+                        c.getCheckContent(),
+                        c.isCompleted()
+                ))
                 .toList();
 
         LocalDate start = date.withDayOfMonth(1);
