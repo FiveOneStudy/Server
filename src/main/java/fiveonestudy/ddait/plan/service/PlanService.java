@@ -21,14 +21,21 @@ public class PlanService {
 
         List<Plan> dailyPlans = planRepository.findByEmailAndDate(email, date);
 
-        List<String> planList = dailyPlans.stream()
-                .map(Plan::getPlanContent)
+        List<PlanItem> planList = dailyPlans.stream()
+                .map(plan -> new PlanItem(
+                        plan.getPlanId(),
+                        plan.getPlanContent()
+                ))
                 .toList();
 
         List<CheckList> checks = checkListRepository.findByEmailAndDate(email, date);
 
         List<CheckItem> checkList = checks.stream()
-                .map(c -> new CheckItem(c.getCheckContent(), c.isCompleted()))
+                .map(c -> new CheckItem(
+                        c.getCheckId(),
+                        c.getCheckContent(),
+                        c.isCompleted()
+                ))
                 .toList();
 
         LocalDate start = date.withDayOfMonth(1);
@@ -67,11 +74,7 @@ public class PlanService {
     public PlanResponse updateMonthlyPlan(String email, PlanMonthUpdateRequest requestDto) {
 
         Plan plan = planRepository
-                .findByEmailAndDateAndPlanContent(
-                        email,
-                        requestDto.getDate(),
-                        requestDto.getOldContent()
-                )
+                .findByPlanIdAndEmail(requestDto.getPlanId(), email)
                 .orElseThrow(() -> new RuntimeException("해당 일정이 존재하지 않습니다."));
 
         Plan updatedPlan = Plan.builder()
@@ -83,22 +86,19 @@ public class PlanService {
 
         planRepository.save(updatedPlan);
 
-        return getPlan(email, requestDto.getDate());
+        return getPlan(email, plan.getDate());
     }
 
-    public PlanResponse deleteMonthlyPlan(String email, PlanMonthInsertRequest requestDto) {
+    public PlanResponse deleteMonthlyPlan(String email, PlanDeleteRequest requestDto) {
 
         Plan plan = planRepository
-                .findByEmailAndDateAndPlanContent(
-                        email,
-                        requestDto.getDate(),
-                        requestDto.getContent()
-                )
+                .findByPlanIdAndEmail(requestDto.getPlanId(), email)
                 .orElseThrow(() -> new RuntimeException("삭제할 일정이 없습니다."));
 
+        LocalDate date = plan.getDate();
         planRepository.delete(plan);
 
-        return getPlan(email, requestDto.getDate());
+        return getPlan(email, date);
     }
 
     public PlanResponse insertCheckList(String email, CheckListInsertRequest requestDto) {
@@ -118,11 +118,7 @@ public class PlanService {
     public PlanResponse updateCheckList(String email, CheckListUpdateRequest requestDto) {
 
         CheckList check = checkListRepository
-                .findByEmailAndDateAndCheckContent(
-                        email,
-                        requestDto.getDate(),
-                        requestDto.getOldContent()
-                )
+                .findByCheckIdAndEmail(requestDto.getCheckId(), email)
                 .orElseThrow(() -> new RuntimeException("해당 체크리스트가 없습니다."));
 
         CheckList updated = CheckList.builder()
@@ -135,38 +131,31 @@ public class PlanService {
 
         checkListRepository.save(updated);
 
-        return getPlan(email, requestDto.getDate());
+        return getPlan(email, check.getDate());
     }
 
-    public PlanResponse deleteCheckList(String email, CheckListInsertRequest requestDto) {
+    public PlanResponse deleteCheckList(String email, CheckListDeleteRequest requestDto) {
 
         CheckList check = checkListRepository
-                .findByEmailAndDateAndCheckContent(
-                        email,
-                        requestDto.getDate(),
-                        requestDto.getContent()
-                )
+                .findByCheckIdAndEmail(requestDto.getCheckId(), email)
                 .orElseThrow(() -> new RuntimeException("삭제할 체크리스트가 없습니다."));
 
+        LocalDate date = check.getDate();
         checkListRepository.delete(check);
 
-        return getPlan(email, requestDto.getDate());
+        return getPlan(email, date);
     }
 
     public PlanResponse completeCheckList(String email, CheckListCompleteRequest requestDto) {
 
         CheckList check = checkListRepository
-                .findByEmailAndDateAndCheckContent(
-                        email,
-                        requestDto.getDate(),
-                        requestDto.getContent()
-                )
+                .findByCheckIdAndEmail(requestDto.getCheckId(), email)
                 .orElseThrow(() -> new RuntimeException("해당 체크리스트가 없습니다."));
 
         check.updateCompleted(!check.isCompleted());
 
         checkListRepository.save(check);
 
-        return getPlan(email, requestDto.getDate());
+        return getPlan(email, check.getDate());
     }
 }

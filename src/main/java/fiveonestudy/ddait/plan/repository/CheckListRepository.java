@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface CheckListRepository extends JpaRepository<CheckList, Long> {
 
+    Optional<CheckList> findByCheckIdAndEmail(Long checkId, String email);
     List<CheckList> findByEmailAndDate(String email, LocalDate date);
     Optional<CheckList> findByEmailAndDateAndCheckContent(String email, LocalDate date, String content);
 }

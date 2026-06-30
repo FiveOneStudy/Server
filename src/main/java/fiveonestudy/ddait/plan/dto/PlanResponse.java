@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class PlanResponse {
     private List<MonthlyPlan> monthPlans;
-    private List<String> planList;
+    private List<PlanItem> planList;
     private List<CheckItem> checkList;
 }

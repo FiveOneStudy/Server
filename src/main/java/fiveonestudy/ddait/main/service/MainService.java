@@ -79,20 +79,15 @@ public class MainService {
     public MainResponse updateCheckAndGetMainData(String email, CheckCompleteRequest requestDto) {
 
         CheckList check = checkListRepository
-                .findByEmailAndDateAndCheckContent(
-                        email,
-                        requestDto.getDate(),
-                        requestDto.getContent()
-                )
+                .findByCheckIdAndEmail(requestDto.getCheckId(), email)
                 .orElseThrow(() -> new RuntimeException("해당 체크리스트를 찾을 수 없습니다."));
 
         check.updateCompleted(true);
 
         checkListRepository.save(check);
 
-        return getMainData(email, requestDto.getDate());
+        return getMainData(email, check.getDate());
     }
-
     public MainResponse getMainData(String email, LocalDate date) {
 
         List<Plan> dailyPlans = planRepository.findByEmailAndDate(email, date);
@@ -100,7 +95,7 @@ public class MainService {
 
         List<CheckList> checks = checkListRepository.findByEmailAndDate(email, date);
         List<CheckItem> checkList = checks.stream()
-                .map(c -> new CheckItem(c.getCheckContent(), c.isCompleted()))
+                .map(c -> new CheckItem(c.getCheckId(), c.getCheckContent(), c.isCompleted()))
                 .toList();
 
         LocalDate start = date.withDayOfMonth(1);

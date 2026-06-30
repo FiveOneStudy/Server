@@ -72,7 +72,7 @@ public class PlanController {
     @DeleteMapping("/month/delete")
     public PlanResponse deleteMonthlyPlan(
             HttpServletRequest request,
-            @RequestBody PlanMonthInsertRequest requestDto
+            @RequestBody PlanDeleteRequest requestDto   // 타입 변경
     ) {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
@@ -126,7 +126,7 @@ public class PlanController {
     @DeleteMapping("/check/delete")
     public PlanResponse deleteCheckList(
             HttpServletRequest request,
-            @RequestBody CheckListInsertRequest requestDto
+            @RequestBody CheckListDeleteRequest requestDto   // 타입 변경
     ) {
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));

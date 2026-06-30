@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CheckItem {
-    private Long checkId;
-    private String checkContent;
-    private boolean completed;
+public class PlanItem {
+    private Long planId;
+    private String planContent;
 }
