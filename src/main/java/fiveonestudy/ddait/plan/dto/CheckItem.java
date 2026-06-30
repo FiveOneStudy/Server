@@ -1,13 +1,14 @@
 package fiveonestudy.ddait.plan.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class CheckItem {
-
-    private String content;
+    private Long checkId;
+    private String checkContent;
     private boolean completed;
-
 }
