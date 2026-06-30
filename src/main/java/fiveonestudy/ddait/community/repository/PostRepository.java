@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByStatusOrderByIdDesc(PostStatus status);
-    List<Post> findAllByStatusOrderByLikeCountDesc(PostStatus status);
+    List<Post> findAllByStatusOrderByViewCountDesc(PostStatus status);
     List<Post> findByUserIdOrderByIdDesc(Long userId);
 
     @Modifying
