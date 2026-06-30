@@ -1,6 +1,8 @@
 package fiveonestudy.ddait.main.service;
 
+import fiveonestudy.ddait.community.repository.PostRepository;
 import fiveonestudy.ddait.main.dto.CheckCompleteRequest;
+import fiveonestudy.ddait.main.dto.CommunitySearchResponse;
 import fiveonestudy.ddait.main.dto.SearchResponse;
 import fiveonestudy.ddait.myPage.repository.UserCertificationRepository;
 import fiveonestudy.ddait.plan.dto.CheckItem;
@@ -35,6 +37,24 @@ public class MainService {
     private final StudyTipRepository studyTipRepository;
     private final UserStudyRepository userStudyRepository;
     private final UserCertificationRepository userCertificationRepository;
+    private final PostRepository postRepository; // 의존성 추가
+
+    @Transactional(readOnly = true)
+    public CommunitySearchResponse searchCommunity(String keyword) {
+
+        List<List<Object>> posts = postRepository.findByTitleContaining(keyword)
+                .stream()
+                .map(post -> Arrays.<Object>asList(
+                        post.getId(),
+                        post.getViewCount(),
+                        post.getTitle()
+                ))
+                .toList();
+
+        return CommunitySearchResponse.builder()
+                .post(posts)
+                .build();
+    }
 
     @Transactional(readOnly = true)
     public SearchResponse searchStudy(String keyword) {
