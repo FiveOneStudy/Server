@@ -53,13 +53,16 @@ public class MainController {
     }
 
     @PostMapping("/main/search")
-    public SearchResponse searchMain(@RequestBody SearchRequest requestDto) {
-        // "study"인 경우에만 검색 수행 (community는 현재 개발 전이므로 빈 리스트 혹은 기본 처리)
+    public Object searchMain(@RequestBody StudySearchRequest requestDto) {
+
         if ("study".equals(requestDto.getSelect())) {
             return mainService.searchStudy(requestDto.getSearch());
         }
 
-        // study가 아닐 경우 빈 응답 반환
+        if ("community".equals(requestDto.getSelect())) {
+            return mainService.searchCommunity(requestDto.getSearch());
+        }
+
         return SearchResponse.builder()
                 .study(Collections.emptyList())
                 .tips(Collections.emptyList())
