@@ -23,7 +23,6 @@ public class MainController {
             HttpServletRequest request,
             @RequestBody MainRequest requestDto
     ) {
-        // StudyController와 동일한 토큰 검증 로직
         String accessToken = jwtService.extractAccessToken(request)
                 .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
 
@@ -48,7 +47,6 @@ public class MainController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
 
-        // 체크 상태 변경 후, 변경된 데이터를 포함한 전체 메인 데이터 반환
         return mainService.updateCheckAndGetMainData(email, requestDto);
     }
 

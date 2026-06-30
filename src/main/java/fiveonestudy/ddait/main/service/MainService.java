@@ -59,13 +59,11 @@ public class MainService {
     @Transactional(readOnly = true)
     public SearchResponse searchStudy(String keyword) {
 
-        // 1. Study 이름 검색 (키워드 포함)
         List<String> studies = studyRepository.findByNameContaining(keyword)
                 .stream()
                 .map(Study::getName)
                 .toList();
 
-        // 2. StudyTip 제목 검색 (키워드 포함)
         List<List<Object>> tips = studyTipRepository.findByTitleContaining(keyword)
                 .stream()
                 .map(tip -> Arrays.asList((Object)tip.getId(), (Object)tip.getTitle()))
@@ -80,7 +78,6 @@ public class MainService {
     @Transactional
     public MainResponse updateCheckAndGetMainData(String email, CheckCompleteRequest requestDto) {
 
-        // 1. 체크리스트 찾기 및 상태 업데이트 (False -> True)
         CheckList check = checkListRepository
                 .findByEmailAndDateAndCheckContent(
                         email,
@@ -89,19 +86,15 @@ public class MainService {
                 )
                 .orElseThrow(() -> new RuntimeException("해당 체크리스트를 찾을 수 없습니다."));
 
-        // 상태를 완료(true)로 변경
         check.updateCompleted(true);
 
-        // 변경 사항 반영을 위해 명시적으로 save 호출 (더티 체킹을 사용해도 무방)
         checkListRepository.save(check);
 
-        // 2. 업데이트 완료 후 기존 getMainData 메서드를 호출하여 동일한 포맷의 응답 생성
         return getMainData(email, requestDto.getDate());
     }
 
     public MainResponse getMainData(String email, LocalDate date) {
 
-        // 1. 플랜 및 체크리스트 조회 (PlanService 로직)
         List<Plan> dailyPlans = planRepository.findByEmailAndDate(email, date);
         List<String> planList = dailyPlans.stream().map(Plan::getPlanContent).toList();
 
@@ -110,7 +103,6 @@ public class MainService {
                 .map(c -> new CheckItem(c.getCheckContent(), c.isCompleted()))
                 .toList();
 
-        // 월간 플랜 맵핑
         LocalDate start = date.withDayOfMonth(1);
         LocalDate end = date.withDayOfMonth(date.lengthOfMonth());
         List<Plan> monthlyPlans = planRepository.findByEmailAndDateBetween(email, start, end);
@@ -124,7 +116,6 @@ public class MainService {
                 .sorted(Comparator.comparing(MonthlyPlan::getDate))
                 .toList();
 
-        // 2. 스터디 및 D-Day 조회 (StudyService 로직)
         Map<String, String> studyDateMap = studyRepository.findAll().stream()
                 .collect(Collectors.toMap(Study::getName, Study::getDate));
 
@@ -136,10 +127,9 @@ public class MainService {
                     return new StudyResponse.MyStudy(us.getStudyName(), dday);
                 }).toList();
 
-        // 3. 자격증 이름 조회 (요청하신 Repository 메서드 활용)
         List<String> certifications = userCertificationRepository.findByUserEmailWithCertification(email)
                 .stream()
-                .map(uc -> uc.getCertification().getName()) // Certification 엔티티에서 name만 추출
+                .map(uc -> uc.getCertification().getName())
                 .toList();
 
         return MainResponse.builder()
