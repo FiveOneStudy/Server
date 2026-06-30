@@ -62,7 +62,7 @@ public class PostService {
     public List<Post> getPosts(PostSort sort) {
 
         return switch (sort) {
-            case POPULAR -> postRepository.findAllByStatusOrderByLikeCountDesc(PostStatus.APPROVED);
+            case POPULAR -> postRepository.findAllByStatusOrderByViewCountDesc(PostStatus.APPROVED);
             case LATEST -> postRepository.findAllByStatusOrderByIdDesc(PostStatus.APPROVED);
         };
     }
@@ -149,7 +149,7 @@ public class PostService {
                         .map(Post::getId)
                         .orElse(null);
             case POPULAR:
-                List<Post> posts = postRepository.findAllByStatusOrderByLikeCountDesc(PostStatus.APPROVED);
+                List<Post> posts = postRepository.findAllByStatusOrderByViewCountDesc(PostStatus.APPROVED);
                 for (int i = 0; i < posts.size(); i++) {
                     if (posts.get(i).getId().equals(currentPost.getId())) {
 
