@@ -148,9 +148,14 @@ public class StudyService {
 
         boolean isOwner = tip.getWriter().equals(nickname);
 
+        String writerProfileImage = userRepository.findByNickname(tip.getWriter())
+                .map(u -> "/mypage/profile-image/" + u.getId())
+                .orElse(null);
+
         return StudyTipReadResponse.builder()
                 .title(tip.getTitle())
                 .writer(tip.getWriter())
+                .profileImage(writerProfileImage)
                 .date(tip.getCreatedDate())
                 .content(tip.getContent())
                 .url(tip.getUrl())

@@ -26,4 +26,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByStatus(PostStatus status);
 
     Optional<Post> findFirstByStatusAndIdLessThanOrderByIdDesc(PostStatus status, Long id);
+
+    List<Post> findByTitleContaining(String title);
 }

@@ -163,7 +163,7 @@ public class PlanService {
                 )
                 .orElseThrow(() -> new RuntimeException("해당 체크리스트가 없습니다."));
 
-        check.updateCompleted(true);
+        check.updateCompleted(!check.isCompleted());
 
         checkListRepository.save(check);
 
