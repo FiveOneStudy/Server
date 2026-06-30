@@ -186,13 +186,7 @@ public class StudyController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
-
-        return studyService.getProgress(
-                user.getNickname(),
-                requestDto.getStudyName()
-        );
+        return studyService.getProgress(email, requestDto.getStudyName()); // user 조회 제거, email 직접 전달
     }
 
     @PostMapping("/progress/complete")
@@ -209,11 +203,8 @@ public class StudyController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
-
         return studyService.completeMission(
-                user.getNickname(),
+                email,
                 requestDto.getStudyName(),
                 requestDto.getSubject()
         );
@@ -234,11 +225,8 @@ public class StudyController {
         String email = jwtService.extractEmail(accessToken)
                 .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("유저 없음"));
-
         return studyService.searchMission(
-                user.getNickname(),
+                email,
                 requestDto.getStudyName(),
                 requestDto.getSearch()
         );
