@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SearchRequest {
+public class StudySearchRequest {
     private String search;
     private String select; // "study" 또는 "community"
 }
