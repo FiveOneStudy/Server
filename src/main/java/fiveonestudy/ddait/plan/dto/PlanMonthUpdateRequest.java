@@ -8,8 +8,6 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 public class PlanMonthUpdateRequest {
-
-    private LocalDate date;
-    private String oldContent;
+    private Long planId;
     private String newContent;
 }

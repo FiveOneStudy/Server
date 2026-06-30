@@ -8,8 +8,6 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 public class CheckListUpdateRequest {
-
-    private LocalDate date;
-    private String oldContent;
+    private Long checkId;
     private String newContent;
 }
