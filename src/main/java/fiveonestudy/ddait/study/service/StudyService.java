@@ -1,10 +1,13 @@
 package fiveonestudy.ddait.study.service;
 
+import fiveonestudy.ddait.myPage.entity.CertificationStatus;
 import fiveonestudy.ddait.study.dto.*;
 import fiveonestudy.ddait.study.entity.*;
 import fiveonestudy.ddait.study.repository.*;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import fiveonestudy.ddait.user.entity.User;
+import fiveonestudy.ddait.myPage.entity.CertificationStatus;
+import fiveonestudy.ddait.myPage.repository.UserCertificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,7 @@ public class StudyService {
     private final StudyTipRepository studyTipRepository;
     private final StudyProgressRepository studyProgressRepository;
     private final UserProgressRepository userProgressRepository;
+    private final UserCertificationRepository userCertificationRepository;
     private final UserRepository userRepository;
 
     public StudyResponse getStudy(String userName) {
@@ -325,4 +329,18 @@ public class StudyService {
                 .answer(true)
                 .build();
     }
+
+    public boolean checkBadge(String email, BadgeCheckRequest request) {
+
+        boolean hasBadge = userCertificationRepository.existsActiveCertificationName(
+                userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("유저 없음"))
+                        .getId(),
+                request.getStudyName(),
+                List.of(CertificationStatus.APPROVED)
+        );
+
+        return hasBadge;
+    }
+
 }

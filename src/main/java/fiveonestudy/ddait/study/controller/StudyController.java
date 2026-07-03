@@ -231,4 +231,22 @@ public class StudyController {
                 requestDto.getSearch()
         );
     }
+
+    @PostMapping("/badge/check")
+    public boolean checkBadge(
+            HttpServletRequest request,
+            @RequestBody BadgeCheckRequest requestDto
+    ) {
+        String accessToken = jwtService.extractAccessToken(request)
+                .orElseThrow(() -> new RuntimeException("Access Token이 없습니다."));
+
+        if (!jwtService.isTokenValid(accessToken)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+
+        String email = jwtService.extractEmail(accessToken)
+                .orElseThrow(() -> new RuntimeException("이메일 추출 실패"));
+
+        return studyService.checkBadge(email, requestDto);
+    }
 }
