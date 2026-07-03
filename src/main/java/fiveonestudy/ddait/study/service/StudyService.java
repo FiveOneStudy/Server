@@ -181,7 +181,7 @@ public class StudyService {
                 .collect(Collectors.toList());
 
         return StudyTipListResponse.builder()
-                .studyName(requestDto.getStudyName()) 
+                .studyName(requestDto.getStudyName())
                 .tips(tipList)
                 .build();
     }
@@ -335,7 +335,7 @@ public class StudyService {
 
     public boolean checkBadge(String email, BadgeCheckRequest request) {
 
-        boolean hasBadge = userCertificationRepository.existsActiveCertificationName(
+        boolean hasBadge = userCertificationRepository.existsActiveCertificationNameContaining(
                 userRepository.findByEmail(email)
                         .orElseThrow(() -> new RuntimeException("유저 없음"))
                         .getId(),
