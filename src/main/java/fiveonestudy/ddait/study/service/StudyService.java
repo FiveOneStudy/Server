@@ -180,7 +180,10 @@ public class StudyService {
                 ))
                 .collect(Collectors.toList());
 
-        return new StudyTipListResponse(tipList);
+        return StudyTipListResponse.builder()
+                .studyName(requestDto.getStudyName()) 
+                .tips(tipList)
+                .build();
     }
 
     private UserProgress getOrCreateUserProgress(StudyProgress study, User user) {
