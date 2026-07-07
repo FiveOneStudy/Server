@@ -1,6 +1,7 @@
 package fiveonestudy.ddait.community.controller;
 
 import fiveonestudy.ddait.community.dto.CreatePostRequest;
+import fiveonestudy.ddait.community.dto.PostCreateResponse;
 import fiveonestudy.ddait.community.dto.PostResponse;
 import fiveonestudy.ddait.community.entity.Post;
 import fiveonestudy.ddait.community.entity.PostSort;
@@ -24,18 +25,18 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Map<String, Long>>> createPost(
+    public ResponseEntity<ApiResponse<PostCreateResponse>> createPost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid CreatePostRequest request
     ) {
 
-        Long id = postService.create(
+        PostCreateResponse response = postService.create(
                 userDetails.getUser(),
                 request.title(),
                 request.content()
         );
 
-        return ResponseEntity.ok(ApiResponse.success(Map.of("postId", id)));
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping

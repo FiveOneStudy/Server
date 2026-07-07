@@ -1,5 +1,6 @@
 package fiveonestudy.ddait.community.service;
 
+import fiveonestudy.ddait.community.dto.CommentCreateResponse;
 import fiveonestudy.ddait.community.dto.CreateCommentRequest;
 import fiveonestudy.ddait.community.entity.Comment;
 import fiveonestudy.ddait.community.entity.CommentStatus;
@@ -8,7 +9,6 @@ import fiveonestudy.ddait.community.repository.CommentRepository;
 import fiveonestudy.ddait.community.repository.PostRepository;
 import fiveonestudy.ddait.global.exception.ForbiddenException;
 import fiveonestudy.ddait.global.exception.NotFoundException;
-import fiveonestudy.ddait.global.external.openai.ModerationClient;
 import fiveonestudy.ddait.global.moderation.dto.ModerationResult;
 import fiveonestudy.ddait.global.moderation.service.ModerationService;
 import fiveonestudy.ddait.user.entity.Role;
@@ -28,7 +28,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final ModerationService moderationService;
 
-    public Long create(User user, Long postId, CreateCommentRequest request) {
+    public CommentCreateResponse create(User user, Long postId, CreateCommentRequest request) {
 
         String content = request.content().trim();
 
@@ -64,7 +64,10 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
-        return comment.getId();
+        return CommentCreateResponse.builder()
+                .commentId(comment.getId())
+                .status(comment.getStatus())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -74,7 +77,7 @@ public class CommentService {
             throw new NotFoundException("게시글 없음");
         }
 
-        return commentRepository.findByPostIdOrderByIdAsc(postId);
+        return commentRepository.findByPostIdAndStatusOrderByIdAsc(postId, CommentStatus.APPROVED);
     }
 
     public void delete(User user, Long postId, Long commentId) {
