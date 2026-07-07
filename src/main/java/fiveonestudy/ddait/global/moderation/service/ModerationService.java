@@ -13,29 +13,37 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ModerationService {
 
-    private final KoreanRiskAnalyzer analyzer;
-    private final ModerationClient client;
+    private final KoreanRiskAnalyzer koreanRiskAnalyzer;
+    private final ModerationClient moderationClient;
 
     public ModerationResult evaluate(String text) {
 
-        RiskLevel local = analyzer.analyze(text);
+        RiskLevel localRisk = koreanRiskAnalyzer.analyze(text);
+        log.info("Local risk: {}", localRisk);
 
-        log.info("local risk = {}", local);
+        RiskLevel aiRisk = moderationClient.analyze(text);
+        log.info("AI risk: {}", aiRisk);
 
-        RiskLevel ai = client.analyze(text);
-
-        log.info("ai risk = {}", ai);
-
-        return merge(local, ai);
+        return mergeAdvanced(localRisk, aiRisk);
     }
 
-    private ModerationResult merge(RiskLevel local, RiskLevel ai) {
+    private ModerationResult mergeAdvanced(RiskLevel local, RiskLevel ai) {
+        if (local == RiskLevel.HIGH && ai == RiskLevel.LOW) {
+            log.info("Conflict detected. Escalating to REVIEW.");
+            return ModerationResult.REVIEW;
+        }
 
-        if (ai == RiskLevel.HIGH || local == RiskLevel.HIGH) {
+        if (local == RiskLevel.HIGH || ai == RiskLevel.HIGH) {
             return ModerationResult.BLOCKED;
         }
 
-        if (ai == RiskLevel.MEDIUM) {
+        int totalScore = local.getScore() + ai.getScore();
+        log.info("Combined Moderation Score: {}", totalScore);
+
+        if (totalScore >= 5) {
+            return ModerationResult.BLOCKED;
+        }
+        if (totalScore >= 3) {
             return ModerationResult.REVIEW;
         }
 

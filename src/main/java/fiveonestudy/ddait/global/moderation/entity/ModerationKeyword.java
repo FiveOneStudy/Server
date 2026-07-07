@@ -13,12 +13,12 @@ public class ModerationKeyword {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
+    @Column(unique = true, nullable = false)
     private String keyword;
 
     private int weight;
 
     @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
     private KeywordCategory category;
 
     private boolean enabled;
