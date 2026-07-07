@@ -8,7 +8,6 @@ import fiveonestudy.ddait.community.repository.CommentRepository;
 import fiveonestudy.ddait.community.repository.PostRepository;
 import fiveonestudy.ddait.global.exception.ForbiddenException;
 import fiveonestudy.ddait.global.exception.NotFoundException;
-import fiveonestudy.ddait.global.external.openai.ModerationClient;
 import fiveonestudy.ddait.global.moderation.dto.ModerationResult;
 import fiveonestudy.ddait.global.moderation.service.ModerationService;
 import fiveonestudy.ddait.user.entity.Role;
@@ -74,7 +73,7 @@ public class CommentService {
             throw new NotFoundException("게시글 없음");
         }
 
-        return commentRepository.findByPostIdOrderByIdAsc(postId);
+        return commentRepository.findByPostIdOrderByIdAsc(postId, CommentStatus.APPROVED);
     }
 
     public void delete(User user, Long postId, Long commentId) {
