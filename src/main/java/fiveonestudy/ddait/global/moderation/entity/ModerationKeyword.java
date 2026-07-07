@@ -1,0 +1,25 @@
+package fiveonestudy.ddait.global.moderation.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+@NoArgsConstructor
+public class ModerationKeyword {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long Id;
+
+    private String keyword;
+
+    private int weight;
+
+    @Enumerated(EnumType.STRING)
+    private KeywordCategory category;
+
+    private boolean enabled;
+}
