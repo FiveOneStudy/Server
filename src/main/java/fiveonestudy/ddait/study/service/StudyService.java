@@ -152,7 +152,7 @@ public class StudyService {
 
         boolean isOwner = tip.getWriter().equals(nickname);
 
-        String writerProfileImage = userRepository.findByNickname(tip.getWriter())
+        String writerProfileImage = userRepository.findFirstByNickname(tip.getWriter()) // 수정
                 .map(u -> "/mypage/profile-image/" + u.getId())
                 .orElse(null);
 
