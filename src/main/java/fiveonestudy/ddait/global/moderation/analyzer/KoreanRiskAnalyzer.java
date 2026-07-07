@@ -1,19 +1,14 @@
 package fiveonestudy.ddait.global.moderation.analyzer;
 
 import fiveonestudy.ddait.global.moderation.dto.RiskLevel;
-import fiveonestudy.ddait.global.moderation.entity.ModerationKeyword;
+import fiveonestudy.ddait.global.moderation.policy.KoreanKeywords;
 import fiveonestudy.ddait.global.moderation.policy.KoreanPatterns;
-import fiveonestudy.ddait.global.moderation.provider.KeywordProvider;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class KoreanRiskAnalyzer {
-
-    private final KeywordProvider keywordProvider;
 
     public RiskLevel analyze(String text) {
 
@@ -21,17 +16,22 @@ public class KoreanRiskAnalyzer {
 
         int score = 0;
 
-        for (ModerationKeyword keyword : keywordProvider.getKeywords()) {
-            if(normalized.contains(keyword.getKeyword())) {
-                score += keyword.getWeight();
-            }
-        }
+        score += matchScore(normalized, KoreanKeywords.VIOLENCE, 3);
+        score += matchScore(normalized, KoreanKeywords.SELF_HARM, 4);
+        score += matchScore(normalized, KoreanKeywords.SEXUAL, 2);
+        score += matchScore(normalized, KoreanKeywords.HARASSMENT, 2);
 
         if (KoreanPatterns.INTENT.matcher(normalized).find()) {
             score += 2;
         }
 
         return toRiskLevel(score);
+    }
+
+    private int matchScore(String text, List<String> keywords, int weight) {
+        return (int) keywords.stream()
+                .filter(text::contains)
+                .count() * weight;
     }
 
     private RiskLevel toRiskLevel(int score) {
