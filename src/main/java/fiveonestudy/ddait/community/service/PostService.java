@@ -1,5 +1,6 @@
 package fiveonestudy.ddait.community.service;
 
+import fiveonestudy.ddait.community.dto.PostCreateResponse;
 import fiveonestudy.ddait.community.entity.Post;
 import fiveonestudy.ddait.community.entity.PostLike;
 import fiveonestudy.ddait.community.entity.PostSort;
@@ -31,8 +32,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final ModerationService moderationService;
 
-    public Long create(User user, String title, String content) {
-
+    public PostCreateResponse create(User user, String title, String content) {
         String text = title.trim() + " " + content.trim();
 
         ModerationResult result = moderationService.evaluate(text);
@@ -55,7 +55,10 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
-        return post.getId();
+        return PostCreateResponse.builder()
+                .postId(post.getId())
+                .status(post.getStatus())
+                .build();
     }
 
     @Transactional(readOnly = true)
