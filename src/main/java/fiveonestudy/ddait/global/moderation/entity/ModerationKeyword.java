@@ -19,6 +19,7 @@ public class ModerationKeyword {
     private int weight;
 
     @Enumerated(EnumType.STRING)
+    @Column(unique = true, nullable = false)
     private KeywordCategory category;
 
     private boolean enabled;
