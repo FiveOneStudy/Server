@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByPostIdAndStatusOrderByIdAsc(Long postId, CommentStatus status);
+    List<Comment> findByPostIdOrderByIdAsc(Long postId);
     List<Comment> findByUserIdOrderByIdDesc(Long userId);
     Optional<Comment> findByIdAndPostId(Long postId, Long id);
 
