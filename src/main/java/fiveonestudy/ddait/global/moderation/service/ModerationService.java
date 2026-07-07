@@ -24,16 +24,26 @@ public class ModerationService {
         RiskLevel aiRisk = moderationClient.analyze(text);
         log.info("AI risk: {}", aiRisk);
 
-        return merge(localRisk, aiRisk);
+        return mergeAdvanced(localRisk, aiRisk);
     }
 
-    private ModerationResult merge(RiskLevel local, RiskLevel ai) {
+    private ModerationResult mergeAdvanced(RiskLevel local, RiskLevel ai) {
+        if (local == RiskLevel.HIGH && ai == RiskLevel.LOW) {
+            log.info("Conflict detected. Escalating to REVIEW.");
+            return ModerationResult.REVIEW;
+        }
 
         if (local == RiskLevel.HIGH || ai == RiskLevel.HIGH) {
             return ModerationResult.BLOCKED;
         }
 
-        if (local == RiskLevel.MEDIUM || ai == RiskLevel.MEDIUM) {
+        int totalScore = local.getScore() + ai.getScore();
+        log.info("Combined Moderation Score: {}", totalScore);
+
+        if (totalScore >= 5) {
+            return ModerationResult.BLOCKED;
+        }
+        if (totalScore >= 3) {
             return ModerationResult.REVIEW;
         }
 
