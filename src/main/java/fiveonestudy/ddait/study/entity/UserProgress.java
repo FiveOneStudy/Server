@@ -1,5 +1,6 @@
 package fiveonestudy.ddait.study.entity;
 
+import fiveonestudy.ddait.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,11 @@ public class UserProgress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nickname;
+    private String nickname; // 표시용으로 유지
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user; // 실제 식별 기준
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_progress_id")

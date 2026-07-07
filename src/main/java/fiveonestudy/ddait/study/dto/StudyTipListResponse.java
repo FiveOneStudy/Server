@@ -10,5 +10,6 @@ import java.util.List;
 @Builder
 public class StudyTipListResponse {
 
+    private String studyName;
     private List<List<Object>> tips;
 }

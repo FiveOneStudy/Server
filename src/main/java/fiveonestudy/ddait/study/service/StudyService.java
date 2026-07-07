@@ -1,10 +1,13 @@
 package fiveonestudy.ddait.study.service;
 
+import fiveonestudy.ddait.myPage.entity.CertificationStatus;
 import fiveonestudy.ddait.study.dto.*;
 import fiveonestudy.ddait.study.entity.*;
 import fiveonestudy.ddait.study.repository.*;
 import fiveonestudy.ddait.user.repository.UserRepository;
 import fiveonestudy.ddait.user.entity.User;
+import fiveonestudy.ddait.myPage.entity.CertificationStatus;
+import fiveonestudy.ddait.myPage.repository.UserCertificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,7 @@ public class StudyService {
     private final StudyTipRepository studyTipRepository;
     private final StudyProgressRepository studyProgressRepository;
     private final UserProgressRepository userProgressRepository;
+    private final UserCertificationRepository userCertificationRepository;
     private final UserRepository userRepository;
 
     public StudyResponse getStudy(String userName) {
@@ -148,7 +152,7 @@ public class StudyService {
 
         boolean isOwner = tip.getWriter().equals(nickname);
 
-        String writerProfileImage = userRepository.findByNickname(tip.getWriter())
+        String writerProfileImage = userRepository.findFirstByNickname(tip.getWriter()) // 수정
                 .map(u -> "/mypage/profile-image/" + u.getId())
                 .orElse(null);
 
@@ -176,16 +180,20 @@ public class StudyService {
                 ))
                 .collect(Collectors.toList());
 
-        return new StudyTipListResponse(tipList);
+        return StudyTipListResponse.builder()
+                .studyName(requestDto.getStudyName())
+                .tips(tipList)
+                .build();
     }
 
-    private UserProgress getOrCreateUserProgress(StudyProgress study, String nickname) {
+    private UserProgress getOrCreateUserProgress(StudyProgress study, User user) {
         return study.getUserProgressList().stream()
-                .filter(u -> u.getNickname().equals(nickname))
+                .filter(u -> u.getUser().getId().equals(user.getId()))
                 .findFirst()
                 .orElseGet(() -> {
                     UserProgress newUser = UserProgress.builder()
-                            .nickname(nickname)
+                            .nickname(user.getNickname())
+                            .user(user)
                             .studyProgress(study)
                             .build();
 
@@ -207,12 +215,15 @@ public class StudyService {
                 });
     }
 
-    public StudyProgressResponse completeMission(String nickname, String studyName, String subject) {
+    public StudyProgressResponse completeMission(String email, String studyName, String subject) {
 
         StudyProgress study = studyProgressRepository.findByStudyName(studyName)
                 .orElseThrow(() -> new RuntimeException("스터디 없음"));
 
-        UserProgress me = getOrCreateUserProgress(study, nickname);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        UserProgress me = getOrCreateUserProgress(study, user);
 
         UserMission targetMission = me.getUserMissions().stream()
                 .filter(um -> um.getStudyMission().getMissionName().equals(subject))
@@ -224,12 +235,15 @@ public class StudyService {
         return buildResponse(study, me);
     }
 
-    public StudyProgressResponse getProgress(String nickname, String studyName) {
+    public StudyProgressResponse getProgress(String email, String studyName) {
 
         StudyProgress study = studyProgressRepository.findByStudyName(studyName)
                 .orElseThrow(() -> new RuntimeException("스터디 없음"));
 
-        UserProgress me = getOrCreateUserProgress(study, nickname);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        UserProgress me = getOrCreateUserProgress(study, user);
 
         return buildResponse(study, me);
     }
@@ -258,30 +272,10 @@ public class StudyService {
                 .average()
                 .orElse(0);
 
-        List<String> nicknames = users.stream()
-                .map(UserProgress::getNickname)
-                .toList();
-
-        Map<String, Long> nicknameToUserId = userRepository.findByNicknameIn(nicknames)
-                .stream()
-                .collect(Collectors.toMap(
-                        User::getNickname,
-                        User::getId
-                ));
-
-        java.util.function.Function<String, String> profileImageUrl = nickname -> {
-            Long userId = nicknameToUserId.get(nickname);
-
-            if (userId == null) {
-                return "";
-            }
-            return "/mypage/profile-image/" + userId;
-        };
-
         List<List<String>> memberProgress = users.stream()
                 .map(u -> List.of(
                         u.getNickname(),
-                        profileImageUrl.apply(u.getNickname()),
+                        "/mypage/profile-image/" + u.getUser().getId(), // 바로 접근, 맵 불필요
                         String.valueOf(progressMap.get(u))
                 ))
                 .toList();
@@ -293,7 +287,7 @@ public class StudyService {
                 ))
                 .toList();
 
-        String myProfileImageUrl = profileImageUrl.apply(me.getNickname());
+        String myProfileImageUrl = "/mypage/profile-image/" + me.getUser().getId();
 
         return StudyProgressResponse.builder()
                 .mainProgress(mainProgress)
@@ -304,12 +298,16 @@ public class StudyService {
                 .mission(mission)
                 .build();
     }
-    public MissionSearchResponse searchMission(String nickname, String studyName, String keyword) {
+
+    public MissionSearchResponse searchMission(String email, String studyName, String keyword) {
 
         StudyProgress study = studyProgressRepository.findByStudyName(studyName)
                 .orElseThrow(() -> new RuntimeException("스터디 없음"));
 
-        UserProgress me = getOrCreateUserProgress(study, nickname);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        UserProgress me = getOrCreateUserProgress(study, user);
 
         List<List<Object>> mission = me.getUserMissions().stream()
                 .filter(um -> um.getStudyMission().getMissionName().contains(keyword))
@@ -334,4 +332,18 @@ public class StudyService {
                 .answer(true)
                 .build();
     }
+
+    public boolean checkBadge(String email, BadgeCheckRequest request) {
+
+        boolean hasBadge = userCertificationRepository.existsActiveCertificationNameContaining(
+                userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("유저 없음"))
+                        .getId(),
+                request.getStudyName(),
+                List.of(CertificationStatus.APPROVED)
+        );
+
+        return hasBadge;
+    }
+
 }
