@@ -73,7 +73,7 @@ public class CommentService {
             throw new NotFoundException("게시글 없음");
         }
 
-        return commentRepository.findByPostIdOrderByIdAsc(postId, CommentStatus.APPROVED);
+        return commentRepository.findByPostIdAndStatusOrderByIdAsc(postId, CommentStatus.APPROVED);
     }
 
     public void delete(User user, Long postId, Long commentId) {
