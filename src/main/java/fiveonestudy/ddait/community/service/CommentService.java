@@ -1,5 +1,6 @@
 package fiveonestudy.ddait.community.service;
 
+import fiveonestudy.ddait.community.dto.CommentCreateResponse;
 import fiveonestudy.ddait.community.dto.CreateCommentRequest;
 import fiveonestudy.ddait.community.entity.Comment;
 import fiveonestudy.ddait.community.entity.CommentStatus;
@@ -27,7 +28,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final ModerationService moderationService;
 
-    public Long create(User user, Long postId, CreateCommentRequest request) {
+    public CommentCreateResponse create(User user, Long postId, CreateCommentRequest request) {
 
         String content = request.content().trim();
 
@@ -63,7 +64,10 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
-        return comment.getId();
+        return CommentCreateResponse.builder()
+                .commentId(comment.getId())
+                .status(comment.getStatus())
+                .build();
     }
 
     @Transactional(readOnly = true)

@@ -1,5 +1,6 @@
 package fiveonestudy.ddait.community.controller;
 
+import fiveonestudy.ddait.community.dto.CommentCreateResponse;
 import fiveonestudy.ddait.community.dto.CommentResponse;
 import fiveonestudy.ddait.community.dto.CreateCommentRequest;
 import fiveonestudy.ddait.community.service.CommentService;
@@ -23,19 +24,19 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Map<String, Long>>> createComment(
+    public ResponseEntity<ApiResponse<CommentCreateResponse>> createComment(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long postId,
             @RequestBody @Valid CreateCommentRequest request
     ) {
 
-        Long id = commentService.create(
+        CommentCreateResponse response = commentService.create(
                 userDetails.getUser(),
                 postId,
                 request
         );
 
-        return ResponseEntity.ok(ApiResponse.success(Map.of("commentId", id)));
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping
