@@ -3,6 +3,7 @@ package fiveonestudy.ddait.myPage.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fiveonestudy.ddait.global.response.ApiResponse;
 import fiveonestudy.ddait.myPage.dto.CertificationListResponse;
+import fiveonestudy.ddait.myPage.dto.CertificationRejectReasonResponse;
 import fiveonestudy.ddait.myPage.dto.CertificationRequest;
 import fiveonestudy.ddait.myPage.dto.CertificationResponse;
 import fiveonestudy.ddait.myPage.entity.CertificationFile;
@@ -111,5 +112,19 @@ public class UserCertificationController {
                 .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getOriginalName() + "\"")
                 .body(file.getFileData());
+    }
+
+    @GetMapping("/{id}/reason")
+    public ResponseEntity<ApiResponse<CertificationRejectReasonResponse>> getRejectReason(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null){
+            throw new RuntimeException("UNAUTHORIZED");
+        }
+
+        String reason = userCertificationService.getRejectReason(userDetails.getId(), id);
+
+        return ResponseEntity.ok(ApiResponse.success(new CertificationRejectReasonResponse(reason)));
     }
 }

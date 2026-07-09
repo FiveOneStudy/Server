@@ -1,10 +1,7 @@
 package fiveonestudy.ddait.myPage.service;
 
 import fiveonestudy.ddait.myPage.dto.CertificationRequest;
-import fiveonestudy.ddait.myPage.entity.Certification;
-import fiveonestudy.ddait.myPage.entity.CertificationFile;
-import fiveonestudy.ddait.myPage.entity.CertificationStatus;
-import fiveonestudy.ddait.myPage.entity.UserCertification;
+import fiveonestudy.ddait.myPage.entity.*;
 import fiveonestudy.ddait.myPage.repository.CertificationFileRepository;
 import fiveonestudy.ddait.myPage.repository.CertificationRepository;
 import fiveonestudy.ddait.myPage.repository.CertificationVerificationRepository;
@@ -128,5 +125,25 @@ public class UserCertificationService {
     @Transactional(readOnly = true)
     public List<Certification> getAllCertifications() {
         return certificationRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public String getRejectReason(Long userId, Long certificationId) {
+        UserCertification uc = userCertificationRepository.findById(certificationId)
+                .orElseThrow(() -> new RuntimeException("CERTIFICATION_NOT_FOUND"));
+
+        if (!uc.getUser().getId().equals(userId)) {
+            throw new RuntimeException("FORBIDDEN");
+        }
+
+        if (uc.getStatus() != CertificationStatus.REJECTED) {
+            throw new RuntimeException("NOT_REJECTED_CERTIFICATION");
+        }
+
+        CertificationVerification verification = certificationVerificationRepository
+                .findByUserCertificationOrderByCreatedAtDesc(uc)
+                .orElseThrow(() -> new RuntimeException("VERIFICATION_NOT_FOUND"));
+
+        return verification.getReason();
     }
 }
