@@ -49,7 +49,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://nfteendondon.vercel.app"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://nfteendondon.vercel.app","https://client-chi-five-62.vercel.app"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setExposedHeaders(Arrays.asList("*"));
